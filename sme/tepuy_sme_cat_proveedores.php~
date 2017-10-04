@@ -1,0 +1,400 @@
+<?php
+session_start();
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Catálogo de Proveedores</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+a:link {
+	color: #006699;
+}
+a:visited {
+	color: #006699;
+}
+a:active {
+	color: #006699;
+}
+-->
+</style>
+<link href="../shared/css/ventanas.css" rel="stylesheet" type="text/css">
+<link href="../shared/css/general.css" rel="stylesheet" type="text/css">
+<link href="../shared/css/tablas.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<?php
+require_once("class_folder/tepuy_sme_c_proveedor.php");
+require_once("../shared/class_folder/tepuy_include.php");
+require_once("../shared/class_folder/class_sql.php");
+require_once("../shared/class_folder/class_fecha.php");
+require_once("../shared/class_folder/class_mensajes.php");
+
+$io_proveedor = new tepuy_sme_c_proveedor();
+$io_include   = new tepuy_include();
+$ls_conect    = $io_include->uf_conectar();
+$io_sql       = new class_sql($ls_conect);
+$ls_codemp    = $_SESSION["la_empresa"]["codemp"];
+$io_fecha     = new class_fecha();
+$io_msg       = new class_mensajes();
+
+if  (array_key_exists("cmbbanco",$_POST))
+	{
+	  $ls_banco=$_POST["cmbbanco"];
+	  $lr_datos["banco"]=$ls_banco;
+    }
+else
+	{
+	  $ls_banco="";
+	}	
+if (array_key_exists("operacion",$_POST))
+   {
+	 $ls_operacion = $_POST["operacion"];
+	 $ls_codpro    = $_POST["txtcodigo"];
+	 $ls_nompro    = $_POST["txtnombre"];
+	 $ls_dirpro    = $_POST["txtdirpro"];
+	 $ls_rifpro    = $_POST["txtrifpro"];
+   }
+else
+   {
+	$ls_operacion = "";
+	$ls_codpro    = "";
+	$ls_nompro    = "";
+	$ls_dirpro    = "";
+	$ls_rifpro    = "";
+   }
+if ($ls_banco=='---')
+   {
+     $ls_banco = '';
+   }
+?>
+<form name="form1" method="post" action="">
+<table width="500" border="0" align="center" cellpadding="0" cellspacing="0" class="formato-blanco">
+      <tr class="titulo-celda">
+        <td height="22" colspan="4" style="text-align:center">Cat&aacute;logo de Proveedores</td>
+      </tr>
+      <tr>
+        <td height="13" align="right">&nbsp;</td>
+        <td height="13">&nbsp;</td>
+        <td height="13" align="right">&nbsp;</td>
+        <td height="13">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="69" height="22" align="right">C&oacute;digo</td>
+        <td width="150" height="22"><input name="txtcodigo" type="text" id="txtcodigo" size="20" maxlength="10" style="text-align:center"></td>
+        <td width="82" height="22" align="right">&nbsp;</td>
+        <td width="197" height="22">&nbsp;</td>
+      </tr>
+      <tr>
+        <td height="22" align="right">Nombre</td>
+        <td height="22" colspan="3"><input name="txtnombre" type="text" id="txtnombre" size="75" maxlength="254" style="text-align:left"></td>
+    <tr>
+      <td height="22" align="right">Direcci&oacute;n</td>
+      <td height="22" colspan="3"><input name="txtdirpro" type="text" id="txtdirpro" size="75" maxlength="254" style="text-align:left"></td>
+      <tr>
+        <td height="22" align="right">Rif</td>
+        <td height="22"><label>
+          <input name="txtrifpro" type="text" id="txtrifpro" style="text-align:left" maxlength="15">
+        </label></td>
+        <td height="22" align="right">Banco</td>
+        <td height="22"><?php
+		$rs_pro=$io_proveedor->uf_select_llenarcombo_banco($ls_codemp);
+		?>      
+          <select name="cmbbanco" id="cmbbanco" style="width:140px " >
+            <option value="---">---seleccione---</option>
+            <?php
+		while ($row=$io_sql->fetch_row($rs_pro))
+  			  {
+			    $ls_codban=$row["codban"];
+			    $ls_nomban=$row["nomban"];
+			    if ($ls_codban==$ls_banco)
+			 	   {
+					 print "<option value='$ls_codban' selected>$ls_nomban</option>";
+				   }
+			    else
+				   {
+					 print "<option value='$ls_codban'>$ls_nomban</option>";
+				   }
+			  } 
+	  ?>
+          </select>
+          <input name="operacion" type="hidden" id="operacion">
+    <tr>
+      <td height="13" align="right">&nbsp;</td>
+      <td height="13">&nbsp;</td>
+      <td height="13" align="right">&nbsp;</td>
+      <td height="13">      
+    <tr>
+      <td height="22" align="right">&nbsp;</td>
+      <td height="22">&nbsp;</td>
+      <td height="22" align="right">&nbsp;</td>
+      <td height="22">      <div align="right"><a href="javascript: ue_search();"><img src="../shared/imagebank/tools20/buscar.png" alt="Buscar" width="20" height="20" border="0">Buscar Proveedor </a></div>
+    <tr>
+      <td height="13" colspan="4" align="right">&nbsp;    </td>
+  </table> 
+<p align="center">
+  <?php
+echo "<table width=750 border=0 cellpadding=1 cellspacing=1 class=fondo-tabla align=center>";
+echo "<tr class=titulo-celda>";
+echo "<td width=75 style=text-align:center>Código</td>";
+echo "<td width=300 style=text-align:center>Nombre del Proveedor</td>";
+echo "<td width=215 style=text-align:left>Dirección</td>";
+echo "<td width=80 style=text-align:center>RIF</td>";
+echo "<td width=80 style=text-align:center>Reg. Nac. Contratistas</td>";
+echo "</tr>";
+
+if ($ls_operacion=="BUSCAR")
+   {
+     $ls_codban = $_POST["cmbbanco"];
+	 $ls_sql    = " SELECT a.*,(SELECT denominacion FROM scg_cuentas WHERE a.sc_cuenta=scg_cuentas.sc_cuenta) as denominacion
+                      FROM rpc_proveedor a
+                     WHERE a.cod_pro like '%".$ls_codpro."%'
+				       AND a.nompro like '%".$ls_nompro."%'
+					   AND a.dirpro like '%".$ls_dirpro."%'
+					   AND a.rifpro like '%".$ls_rifpro."%'
+					   AND a.codban like '%".$ls_banco."%'
+					   AND a.cod_pro<>'----------'
+                     ORDER BY a.cod_pro ASC";
+	 $rs_data = $io_sql->select($ls_sql);
+	 $lb_existe=false;
+	 while ($row=$io_sql->fetch_row($rs_data))
+		   {
+			 $lb_existe=true;
+			 echo "<tr class=celdas-blancas>";
+			 $ls_codpro=$row["cod_pro"];
+			 $ls_nompro=$row["nompro"];
+			 $ls_dirpro=$row["dirpro"];
+			 $ls_tipoorg =$row["codtipoorg"];
+			 $ls_telpro=$row["telpro"];
+			 $ls_faxpro=$row["faxpro"];
+			 $ls_nacpro=$row["nacpro"];
+			 $ls_especialidad=$row["codesp"];
+		 	 $ls_rifpro=$row["rifpro"];
+			 $ls_nitpro=$row["nitpro"];
+			 $ld_capital= number_format ($row["capital"],2,',','.');
+			 $ld_monmax= number_format ($row["monmax"],2,',','.');
+			 $ls_banco=$row["codban"];
+			 $ls_cuenta=$row["ctaban"];
+			 $ls_moneda=$row["codmon"];
+			 //Zona Geografica
+			 $ls_pais=$row["codpai"];
+			 $ls_estado=$row["codest"];
+			 $ls_municipio=$row["codmun"];
+			 $ls_parroquia = $row["codpar"];
+			 //Fin de Zona Geográfica
+			
+			 $ls_provee=$row["estpro"];
+			 $ls_contra=$row["estcon"];
+			 $ls_contable      = $row["sc_cuenta"];
+			 $ls_contablecomp  = $row["sc_cuenta_comp"];
+			 $ls_denocontable  = $row["denominacion"];
+			 $ls_observacion   = $row["obspro"];
+			 $ls_cedula        = $row["cedrep"];
+			 $ls_nomrep        = $row["nomreppro"];
+			 $ls_cargo         = $row["carrep"];
+			 $ls_numregRNC     = $row["ocei_no_reg"];
+			 $ls_registro      = $row["registro"];
+			 $ls_fecharegistro = $row["fecreg"];
+			 $ls_fecreg        = substr($ls_fecharegistro,8,2)."/".substr($ls_fecharegistro,5,2)."/".substr($ls_fecharegistro,0,4);
+			 $ls_numero        = $row["nro_reg"];
+			 $ls_tomo          = $row["tomo_reg"];
+			 $ls_tommod		  = $row["tommod"];
+			 $ls_fecRNC		  = $row["ocei_fec_reg"];
+			 $ls_fecregRNC     = substr($ls_fecRNC,8,2)."/".substr($ls_fecRNC,5,2)."/".substr($ls_fecRNC,0,4);
+			 $ls_fecmod        = $row["fecregmod"];
+			 $ls_fecregmod     = substr($ls_fecmod,8,2)."/".substr($ls_fecmod,5,2)."/".substr($ls_fecmod,0,4);
+			 $ls_regmod        = $row["regmod"];
+			 $ls_nummod        = $row["nummod"];
+			 $ls_numfol        = $row["folreg"];
+			 $ls_numfolmod     = $row["folmod"];
+			 $ls_numlic        = $row["numlic"];
+			 $ls_inspector     = $row["inspector"];
+			 $ls_pagweb        = $row["pagweb"];
+			 $ls_email         = $row["email"];
+			 $ls_estatus       = $row["estprov"];
+			 $ls_emailrep      = $row["emailrep"];
+			 $ls_grado         = $row["graemp"];
+			 if ($ls_estatus==0)
+			    {
+				 $ls_estprov="A";
+			    }
+			 else
+			 if ($ls_estatus==1)
+			    {
+				 $ls_estprov="I";
+			    }
+			 else
+			 if ($ls_estatus==2)
+			   {
+				 $ls_estprov="B";
+			   }
+			 else
+			   if ($ls_estatus==3)
+			   {
+				 $ls_estprov="S";
+			   }
+			 $ls_fechavenRNC   = $row["fecvenrnc"];
+			 $ls_fecvenRNC     = substr($ls_fechavenRNC,8,2)."/".substr($ls_fechavenRNC,5,2)."/".substr($ls_fechavenRNC,0,4);
+			 $ls_regSSO        = $row["numregsso"];
+			 $ls_fechavenSSO   = $row["fecvensso"];
+			 $ls_fecvenSSO     = substr($ls_fechavenSSO,8,2)."/".substr($ls_fechavenSSO,5,2)."/".substr($ls_fechavenSSO,0,4);
+			 $ls_regINCE       = $row["numregince"];
+			 $ls_fechavenINCE  = $row["fecvenince"];
+			 $ls_fecvenINCE    = substr($ls_fechavenINCE,8,2)."/".substr($ls_fechavenINCE,5,2)."/".substr($ls_fechavenINCE,0,4);
+			 $ls_codbansig     = $row["codbansig"];
+			 $ls_tipconpro     = $row["tipconpro"];
+			 $ls_denbansig     = "";
+			 $ls_sql2          = "SELECT denbansig FROM tepuy_banco_sigecof WHERE codbansig = '".$ls_codbansig."'"; 
+			 $rs_datos         = $io_sql->select($ls_sql2);
+			 $ld_hoy=date('Y')."-".date('m')."-".date('d');
+			 if($io_fecha->uf_comparar_fecha($ld_hoy,$ls_fechavenRNC))
+			 {
+				$lb_registronacional="VIGENTE";
+			 }
+			 else
+			 {
+				$lb_registronacional="VENCIDO";
+			 }
+			 if ($row2=$io_sql->fetch_row($rs_datos))
+			    {
+				  $ls_denbansig = $row2["denbansig"];   
+			    }
+			 $ls_sql3          = "SELECT denominacion FROM scg_cuentas WHERE sc_cuenta = '".$ls_contablecomp."'"; 
+			 $rs_datos         = $io_sql->select($ls_sql3);
+			 if ($row3=$io_sql->fetch_row($rs_datos))
+			    {
+				  $ls_dencontablecomp = $row3["denominacion"];   
+			    }
+			 echo "<td width=75 style=text-align:center><a href=\"javascript: aceptar('$ls_codpro','$ls_nompro','$ls_dirpro','$ls_tipoorg','$ls_telpro','$ls_faxpro','$ls_nacpro','$ls_especialidad','$ls_rifpro','$ls_nitpro','$ld_capital','$ld_monmax',
+			 '$ls_banco','$ls_cuenta','$ls_moneda','$ls_provee','$ls_contra','$ls_contable','$ls_contablecomp','$ls_denocontable','$ls_dencontablecomp','$ls_observacion','$ls_cedula','$ls_nomrep','$ls_cargo',
+			 '$ls_numregRNC','$ls_registro','$ls_fecreg','$ls_numero','$ls_tomo','$ls_tommod','$ls_fecregRNC','$ls_fecregmod','$ls_regmod','$ls_nummod','$ls_numfol','$ls_numfolmod','$ls_numlic',
+			 '$ls_inspector','$ls_pais','$ls_estado','$ls_municipio','$ls_parroquia','$ls_pagweb','$ls_email','$ls_estprov','$ls_fecvenRNC','$ls_regSSO','$ls_fecvenSSO','$ls_regINCE','$ls_fecvenINCE','$ls_emailrep','$ls_grado','$ls_codbansig','$ls_denbansig','$ls_tipconpro','$lb_registronacional');\">".$ls_codpro."</a></td>";
+			 echo "<td width=300 style=text-align:left>".$row["nompro"]."</td>";
+			 echo "<td width=215 style=text-align:left>".$row["dirpro"]."</td>";
+			 echo "<td width=80 style=text-align:left>".$row["rifpro"]."</td>";
+			 echo "<td width=80 style=text-align:center>".$lb_registronacional."</td>";
+			 echo "</tr>";			
+		   }
+       if ($lb_existe==false)
+	      {
+		    $io_msg->message("No se han Creado Proveedores !!!");
+		  }
+   }
+echo "</table>";
+echo "<br>";
+?>
+</p>
+</form>      
+
+</body>
+<script language="JavaScript">
+function aceptar(codpro,nompro,dirpro,tipoorg,telpro,faxpro,nacpro,especialidad,rifpro,nitpro,capital,monmax,banco,cuenta,moneda,provee,contra,contable,contablecomp,denocontable,dencontablecomp,observacion,cedula,nomrep,cargo,
+				 numregRNC,registro,fecreg,numero,tomo,tommod,fecregRNC,fecregmod,regmod,nummod,numfol,numfolmod,licencia,inspector,pais,estado,municipio,parroquia,pagweb,email,estatus,fecvenRNC,
+				 regSSO,fecvenSSO,regINCE,fecvenINCE,emailrep,grado,codbansig,denbansig,ls_tipconpro,registronacional)
+  {
+    opener.document.form1.txtcodigo.value       = codpro;
+	opener.document.form1.txtnombre.value       = nompro;
+	opener.document.form1.txtdireccion.value    = dirpro;
+	opener.document.form1.cmbtiporg.value       = tipoorg;
+	opener.document.form1.txttelefono.value     = telpro;
+	opener.document.form1.txtfax.value          = faxpro;
+	opener.document.form1.cmbnacionalidad.value = nacpro;
+	opener.document.form1.cmbespecialidad.value = especialidad;
+	opener.document.form1.txtrif.value          = rifpro;
+	opener.document.form1.txtnit.value          = nitpro;
+	opener.document.form1.txtcapital.value      = capital;
+	opener.document.form1.txtmonmax.value       = monmax;
+	opener.document.form1.cmbbanco.value        = banco;
+	opener.document.form1.txtcuenta.value       = cuenta;
+	opener.document.form1.cmbmoneda.value       = moneda;
+	opener.document.form1.cmbpais.value         = pais;
+	opener.document.form1.cmbgraemp.value       = grado;
+	opener.document.form1.chkestpro.checked=false;
+	opener.document.form1.chkestcon.checked=false;
+	if (provee=="1")
+	   {
+	     opener.document.form1.chkestpro.checked=true;
+	   }
+	if (contra=="1")
+	   {
+	     opener.document.form1.chkestcon.checked=true;
+	   }
+	opener.document.form1.txtcontable.value     = contable;
+	opener.document.form1.txtcontablecomp.value = contablecomp;
+	opener.document.form1.txtdencuenta.value    = denocontable;
+	opener.document.form1.txtdencontablecomp.value    = dencontablecomp;
+    opener.document.form1.txtobservacion.value  = observacion;
+	opener.document.form1.txtcedula.value       = cedula;
+	opener.document.form1.txtnomrep.value       = nomrep;
+	opener.document.form1.txtcargo.value        = cargo;
+	opener.document.form1.txtnumregRNC.value    = numregRNC;
+	opener.document.form1.txtregistro.value     = registro;
+	opener.document.form1.txtfecreg.value       = fecreg;
+	opener.document.form1.txtnumero.value       = numero;
+	opener.document.form1.txttomo.value         = tomo;
+	opener.document.form1.txttommod.value       = tommod;
+	opener.document.form1.txtfecregRNC.value    = fecregRNC;
+	opener.document.form1.txtfecregmod.value    = fecregmod;
+	opener.document.form1.txtregmod.value       = regmod;
+	opener.document.form1.txtnummod.value       = nummod;
+	opener.document.form1.txtnumfol.value       = numfol;
+	opener.document.form1.txtnumfolmod.value    = numfolmod;
+	opener.document.form1.txtnumlic.value       = licencia;
+	opener.document.form1.txtemailrep.value     = emailrep;
+
+	if(inspector==1)
+	{
+	opener.document.form1.cbinspector.checked=true;	
+	}
+	else
+	{
+	opener.document.form1.cbinspector.checked=false;	
+	}
+    
+	opener.document.form1.hidestado.value=estado;
+	opener.document.form1.hidmunicipio.value=municipio;
+	opener.document.form1.hidparroquia.value=parroquia;
+    opener.document.form1.hidestatus.value='GRABADO';
+	opener.document.form1.txtpagweb.value=pagweb;
+	opener.document.form1.txtemail.value=email;
+    if (estatus=="A")
+	   {
+	     opener.document.form1.estprov[0].checked=true;
+	   }
+	else if(estatus=="I")
+	   {
+	     opener.document.form1.estprov[1].checked=true;
+ 	   }
+	else if (estatus=="B")
+  	   {
+	     opener.document.form1.estprov[2].checked=true;
+	   }
+	else
+	   {
+	     opener.document.form1.estprov[3].checked=true;
+	   }
+	opener.document.form1.txtfecvenRNC.value     = fecvenRNC;
+	opener.document.form1.txtregSSO.value        = regSSO;
+	opener.document.form1.txtfecvenSSO.value     = fecvenSSO;
+	opener.document.form1.txtregINCE.value       = regINCE;
+    opener.document.form1.txtfecvenINCE.value    = fecvenINCE;
+	opener.document.form1.txtcodbancof.value     = codbansig;
+	opener.document.form1.txtnombancof.value     = denbansig;
+	opener.document.form1.cmbcontribuyente.value = ls_tipconpro;
+	opener.document.form1.txtestatusRNC.value = registronacional;
+	opener.document.form1.operacion.value        = "buscar";
+	opener.document.form1.submit();
+	close();
+  }
+  
+  function ue_search()
+  {
+    f=document.form1;
+    f.operacion.value="BUSCAR";
+    f.action="tepuy_rpc_cat_proveedores.php";
+    f.submit();
+  }
+</script>
+</html>

@@ -1,0 +1,103 @@
+.contorno-rojoX{background-color:#ffffff;border: 3px solid #999999;font-family: Tahoma, Verdana, Arial;font-size: 11px;color: #666666;} /* ffffff Blanco  999999 Gris*/
+.contorno-rojo{background-color:#0014CD;border: 3px solid #999999;font-family: Tahoma, Verdana, Arial;font-size: 11px;color: #666666;} /* CC0000 Rojo 0014CD Azul*/
+.formato-blanco {
+	font-family: Tahoma, Verdana, Arial;
+	font-size: 11px;
+	font-weight: normal;
+	color: #0014CD; /* CC0000 Rojo 0014CD Azul*/
+	background-color:  #ffffff; /* ffffff Blanco */
+	border: 1px solid #BBBBBB; /* BBBBBB Gris */
+	padding-top: 2px;
+	padding-right: 5px;
+	padding-bottom: 2px;
+	padding-left: 5px;
+	text-indent: 5px;
+}
+.formato-blancX {
+	font-family: Tahoma, Verdana, Arial;
+	font-size: 11px;
+	font-weight: normal;
+	color: #FFFFFF  ; /* 000000 Negro*/
+	background-color:  #ffffff; /* ffffff Blanco */
+	border: 1px solid #BBBBBB; /* BBBBBB Gris */
+	padding-top: 2px;
+	padding-right: 5px;
+	padding-bottom: 2px;
+	padding-left: 5px;
+	text-indent: 5px;
+}
+.formato-catalogo{
+	font-family: Tahoma, Verdana, Arial;
+	font-size:11px;
+	font-weight: normal;
+	color:#0014CD; /* CC0000 Rojo 0014CD Azul*/
+	background-color: #ffffff; /* ffffff Blanco */
+	border: 1px solid #BBBBBB; /* BBBBBB Gris */
+	padding: 2px;
+}
+.formato-catalogX{
+	font-family: Tahoma, Verdana, Arial;
+	font-size:11px;
+	font-weight: normal;
+	color:#666666; /* 666666 Gris */
+	background-color: #ffffff; /* ffffff Blanco */
+	border: 1px solid #BBBBBB; /* BBBBBB Gris */
+	padding: 2px;
+}
+.letras-pequeñas{font-family: Verdana, Arial, Helvetica, sans-serif;font-size: 10px;color: #0014CD;} /* CC0000 Rojo 0014CD Azul*/
+.letras-pequenas{font-family: Verdana, Arial, Helvetica, sans-serif;font-size: 10px;color: #0014CD;} /* CC0000 Rojo 0014CD Azul*/
+.texto-azuX{color:#000099;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:bold;} /* 000099 Azul*/
+.texto-azul{color:#0014CD;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:bold;} /* CC0000 Rojo 0014CD Azul*/
+.texto-rojo{color:#0014CD;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:bold;}/* FF0000 Rojo 0014CD Azul*/
+.letras-negritaX{color:#000000;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:bold;}
+.letras-negrita{color:#0014CD;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:bold;}  /* CC0000 Rojo 0014CD Azul*/
+.titulo-ventana{color:#FFFFFF;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:bold;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px;text-align: center;background-color: #2E82CB;}  /* CC0000 Rojo 0014CD Azul*/
+.titulo-ventanX{color:#FFFFFF;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:bold;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px;text-align: center;background-color: #2E82CB;} /* CC0000 Rojo 0014CD Azul*/
+.titulo-catalogoX{font-family: Verdana;font-size:14px;font-weight: bold;color: #336699;text-align: center;vertical-align: middle;font-style: normal;} /* 336699 Azul */
+.titulo-catalogo{font-family: Verdana;font-size:14px;font-dae9f3weight: bold;color: #0014CD;text-align: center;vertical-align: middle;font-style: normal;} /* CC0000 Rojo 0014CD Azul*/
+.titulo-conect {
+color:#006699;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:bold;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px;text-align: center;background-color: #FFFFFF; /* 006699 Azul */
+}
+.titulo-catclaro {
+	font-family: Verdana;
+	font-size:14px;
+	font-weight: bold;
+	color: #000000;
+	text-align: center;
+	vertical-align: middle;
+	font-style: normal;
+	background-color: #DEEBF7; /* DEEBF7 Azul Claro */
+}
+.titulo-nuevoX {
+color:#FFFFFF;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:bold;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px;text-align: center;background-color: #3982C6;
+}
+.titulo-nuevo {
+color:#FFFFFF;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:bold;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px;text-align: center;background-color: #2E82CB; /* CC0000 Rojo 0014CD Azul*/
+}
+.formato-azul {
+
+	font-family: Tahoma, Verdana, Arial;
+	font-size:11px;
+	font-weight: normal;
+	color:#666666;
+	background-color: #0014CD; /* CC0000 Rojo 0014CD Azul*/
+	border: 1px solid #BBBBBB;
+	padding: 2px;
+}
+.formato-azulX {
+
+	font-family: Tahoma, Verdana, Arial;
+	font-size:11px;
+	font-weight: normal;
+	color:#666666;
+	background-color: #dae9f3; /* dae9f3 Blanco */
+	border: 1px solid #BBBBBB;
+	padding: 2px;
+}
+.sin-bordeclaro {
+	border:none;
+	color:#000000;
+	cursor:text;
+	background-color: #E1F0FF; /* E1F0FF Azul Claro */
+}
+

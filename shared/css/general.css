@@ -1,0 +1,84 @@
+body{
+	color:#000000; /* 000000 Negro */
+	font-family:Tahoma, Verdana, Arial;
+	font-size:11px;
+	margin:0px 5px 0px 0px;
+	background-color: #EBEBEB; /* EBEBEB Gris Claro*/
+	top: 0px;
+	right: 5px;
+}
+input,checkbox{border:thin solid #000000;color: #000000;}
+input,select,textarea,text{background-color:#FFFFFF;border:1px solid #999999;color:#000000;font-family:Tahoma, Verdana, Arial;font-size:11px;} /* Gris y Negro */
+.sin-borde{
+	border:none;
+	color:#000000;
+	cursor:text;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.sin-bordeX{
+	border:none;
+	color:#000000; /* 000000 Negro */
+	cursor:text;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.boton{
+	border-right:1px ridge #666666; /* 666666 Gris Oscuro*/
+	border-top:1px ridge #FFFFFF; /* FFFFFF Blanco */
+	border-left:1px ridge #FFFFFF;
+	border-bottom:1px ridge #666666;
+	font-weight:bold;
+	cursor:pointer;
+	color: #000000;
+	background-color:#CCCCCC; /* CCCCCC Gris Claro*/
+	font-family: Tahoma, Verdana, Arial;
+	font-size: 11px;
+	background-image: none;
+}
+.sin-bordeCopy {
+	border:none;
+	color:#000000;
+	cursor:text;
+	background-color: #E2EFFE; /* E2EFFE Azul Claro */
+}
+.sin-borde2 {
+	border:none;
+	color:#1400CD; /* CC0000 Rojo  1400CD Azul*/
+	cursor:text;
+	font-weight: bold;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+}
+.sin-borde2X {
+	border:none;
+	color:#3982C6; /* 3982C6 Azul Claro */
+	cursor:text;
+	font-weight: bold;
+	font-family: Arial, Helvetica, sans-serif;
+
+	font-size: 14px;
+}
+.sin-bordeAzulX {
+	border:none;
+	color:#FFFFFF; /* FFFFFF Blanco */
+	cursor:text;
+	background-color: #3982C6; /* 3982C6 Azul Claro */
+	font-weight: bold;
+	font-size: 12px;
+}
+.sin-bordeAzul {
+	border:none;
+	color:#0014CD; /* CC0000 Rojo 0014CD Azul*/
+	cursor:text;
+	background-color: #3982C6; /* 3982C6 Azul Claro */
+	font-weight: bold;
+	font-size: 12px;
+}
+.resaltado-rojo {
+	color: #5100FF; /* FF0000 Rojo 5100FF Azul*/
+}
+.nota {
+	color: #999999; /* 999999 Gris */
+	font-style: italic;
+	font-weight: bold;
+	text-transform: none;
+}

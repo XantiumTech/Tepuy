@@ -1,0 +1,288 @@
+<?php
+session_start();
+	$ld_fecdes="01/".date("m")."/".date("Y");
+	$ld_fechas=date("d/m/Y");
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Listado de Facturas Emitidas</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+a:link {
+	color: #006699;
+}
+a:visited {
+	color: #006699;
+}
+a:active {
+	color: #006699;
+}
+-->
+</style>
+<link href="../shared/js/css_intra/datepickercontrol.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" language="JavaScript1.2" src="../shared/js/number_format.js"></script>
+<script language="javascript" src="../shared/js/js_intra/datepickercontrol.js"></script>
+<link href="../shared/css/ventanas.css" rel="stylesheet" type="text/css">
+<link href="../shared/css/general.css" rel="stylesheet" type="text/css">
+<link href="../shared/css/tablas.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<form name="formulario" method="post" action="">
+  <p align="center">
+    <input name="operacion" type="hidden" id="operacion">
+    <input name="hidstatus" type="hidden" id="hidstatus">
+</p>
+  <table width="500" border="0" align="center" cellpadding="1" cellspacing="1">
+    <tr>
+      <td width="496" colspan="2" class="titulo-celda">Listado de Facturas Emitidas</td>
+    </tr>
+  </table>
+<br>
+    <table width="500" border="0" cellpadding="0" cellspacing="0" class="formato-blanco" align="center">
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    <table width="520" border="0" align="center" cellpadding="1" cellspacing="0" class="formato-blanco">
+      <tr>
+        <td height="21"><div align="right">N&uacute;mero de Factura </div></td>
+        <td width="217" height="21"><input name="txtnumfactura" type="text" id="txtnumfactura" onKeyPress="javascript: ue_mostrar(this,event);"></td>
+        <td width="160" rowspan="3"><table width="145" border="0" align="right" cellpadding="0" cellspacing="0" class="formato-blanco">
+          <tr>
+            <td height="22" colspan="2"><div align="center">Fecha de Emisi&oacute;n </div></td>
+          </tr>
+          <tr>
+            <td width="58" height="22"><div align="right">Desde</div></td>
+            <td width="85"><input name="txtfecdes" type="text" id="txtfecdes" size="15" onKeyPress="javascript: ue_formatofecha(this,'/',patron,true);"  datepicker="true" value="<?php print $ld_fecdes;?>"></td>
+          </tr>
+          <tr>
+            <td height="22"><div align="right">Hasta</div></td>
+            <td><input name="txtfechas" type="text" id="txtfechas" size="15" onKeyPress="javascript: ue_formatofecha(this,'/',patron,true);"  datepicker="true" value="<?php print $ld_fechas;?>"></td>
+          </tr>
+        </table>
+        <div align="right"></div></td>
+      </tr>
+
+      <tr>
+        <td height="22">&nbsp;</td>
+        <td height="22">&nbsp;</td>
+      </tr>
+   <tr>
+      <td height="22"><div align="right">Cliente</div></td>
+      <td height="22"><label>
+        <input name="txtcedcli" type="text" id="txtcedcli" style="text-align:center" value="<?php print $ls_cedcliv ?>" size="20" maxlength="10" />
+        <a href="javascript: ue_catalogo_cliente();"><img src="../shared/imagebank/tools15/buscar.png" alt="Buscar" width="15" height="15" border="0" /></a></label></td>
+      <td height="22" colspan="2"><label>
+        
+        <div align="left">
+          <input name="txtnomcli" type="text" class="sin-borde" id="txtnomcli" value="<?php print $ls_nomcli ?>" size="55" readonly />
+        </div>
+      </label></td>
+    </tr>
+	  <tr>
+        <td colspan="3"><div align="right"><a href="javascript: ue_search();"><img src="../shared/imagebank/tools20/buscar.png" alt="Buscar" width="20" height="20" border="0"> Buscar</a></div></td>
+	  </tr>
+
+    </table>
+  <br>
+<?php
+	require_once("../shared/class_folder/tepuy_include.php");
+	$in     =new tepuy_include();
+	$con    =$in->uf_conectar();
+	require_once("../shared/class_folder/class_mensajes.php");
+	$io_msg =new class_mensajes();
+	require_once("../shared/class_folder/class_funciones.php");
+	$io_fun =new class_funciones();
+	require_once("../shared/class_folder/class_datastore.php");
+	$ds     =new class_datastore();
+	require_once("../shared/class_folder/class_sql.php");
+	$io_sql =new class_sql($con);
+	require_once("tepuy_sfa_c_producto.php");
+	$io_sfa= new tepuy_sfa_c_producto();
+	
+	$arre=$_SESSION["la_empresa"];
+	$ls_codemp=$arre["codemp"];
+	$li_estnum="";
+	$li_catalogo=$io_sfa->uf_sfa_select_catalogo($li_estnum,$li_estcmp);
+	if(array_key_exists("operacion",$_POST))
+	{
+		$ls_operacion=$_POST["operacion"];
+		$ls_numfactura="%".$_POST["txtnumfactura"]."%";
+		$ls_cedcli="%".$_POST["txtnumfactura"]."%";
+		$ls_nomcli="%".$_POST["txtnomcli"]."%";
+		$ls_status="%".$_POST["hidstatus"]."%";
+	}
+	else
+	{
+		$ls_operacion="";
+	
+	}
+		print "<table width=600 border=0 cellpadding=1 cellspacing=1 class=fondo-tabla align=center>";
+		print "<tr class=titulo-celda>";
+		print "<td width=120 style='cursor:pointer' title='Ordenar por Nro. Factura' align='center' onClick=ue_orden('numfactura')>Nro. de Factura</td>";
+		print "<td width=150 style='cursor:pointer' title='Ordenar por Cliente' align='center' onClick=ue_orden('nomcli')>Cliente</td>";
+		print "<td width=90  style='cursor:pointer' title='Ordenar por Estatus' align='center' onClick=ue_orden('estfac')>Estatus</td>";
+		print "<td width=70 style='cursor:pointer' title='Ordenar por Fecha de Registro' align='center' onClick=ue_orden('fecfactura')>Fecha de Registro</td>";
+		print "<td width=100 style='cursor:pointer' title='Ordenar por Monto' align='center' onClick=ue_orden('montot')>Monto</td>";
+		print "</tr>";
+	if($ls_operacion=="BUSCAR")
+	{
+		$ld_fecdes=substr($ld_fecdes,6,4)."-".substr($ld_fecdes,3,2)."-".substr($ld_fecdes,0,2);
+		$ld_fechas=substr($ld_fechas,6,4)."-".substr($ld_fechas,3,2)."-".substr($ld_fechas,0,2);
+		$ls_sql="SELECT sfa_factura.*, ". 
+				"      (SELECT MAX(sfa_cliente.nomcli) FROM sfa_cliente ".
+				"        WHERE sfa_cliente.codemp=sfa_factura.codemp AND sfa_cliente.cedcli=sfa_factura.cedcli) AS nomcli, ".
+				"      (SELECT MAX(sfa_cliente.apecli) FROM sfa_cliente ".
+				"        WHERE sfa_cliente.codemp=sfa_factura.codemp AND sfa_cliente.cedcli=sfa_factura.cedcli) AS apecli,".
+				"      (SELECT sfa_cliente.trabajador FROM sfa_cliente ".
+				"        WHERE sfa_cliente.codemp=sfa_factura.codemp AND sfa_cliente.cedcli=sfa_factura.cedcli) AS trabajador ".
+				"  FROM sfa_factura ".
+				" WHERE sfa_factura.codemp = '".$ls_codemp."'".
+				"   AND sfa_factura.numfactura like '".$ls_numfactura."'".
+				"   AND sfa_factura.cedcli like '".$ls_cedcli."' ".
+				"   AND sfa_factura.fecfactura BETWEEN '".$ld_fecdes."' AND '".$ld_fechas."' ".
+				"   AND sfa_factura.numfactura>'0000000000' ".
+				" ORDER BY numfactura";
+		//print $ls_sql;
+		$rs_data=$io_sql->select($ls_sql);
+		$li_num=$io_sql->num_rows($rs_data);
+		//print "Registros: ".$li_num;
+		if($li_num>0)
+		{
+			while($row=$io_sql->fetch_row($rs_data))
+			{
+				print "<tr class=celdas-blancas>";
+				$ls_numfactura=$row["numfactura"];
+
+				$ld_fecfactura = $io_fun->uf_convertirfecmostrar($row["fecfactura"]);
+
+				$ls_estfac=$row["estfac"];
+				$ls_trabajador=$row["trabajador"];
+				$ls_forpagfac=$row["forpagfac"];
+				$ls_obsfac=$row["obsfac"];
+
+				$ld_monsubtot=number_format($row["monsubtot"],2,",",".");
+				$ld_monbasimp=number_format($row["monbasimp"],2,",",".");
+				$ld_monimp=number_format($row["monimp"],2,",",".");
+				$ld_montot=number_format($row["montot"],2,",",".");
+				$ls_cedcli=$row["cedcli"];
+				$ls_nomcli=utf8_encode($row["nomcli"])." ".utf8_encode($row["apecli"]);
+				$ls_usuario=$row["usuario"];
+				$ls_trabajador=$row["trabajador"];
+				
+				switch ($ls_estfac)
+				{
+					case "0": // Deberian ir en letras(R) como estan en la sep y en cxp 
+						$ls_estatus="REGISTRO";
+						break;
+						
+					case "1":
+						$ls_estatus="EMITIDA";
+						break;
+						
+					case "2":
+						$ls_estatus="PROCESADA";
+						break;
+						
+					case "3":
+						$ls_estatus="ANULADA";
+						break;
+				}
+				//print "<tr class=celdas-blancas>";
+
+			    switch ($ls_tipo)
+				{
+					case "":
+						print "<td align='center'><a href=\"javascript: aceptar('$ls_numfactura','$ls_estfac','$ld_fecfactura','$ls_cedcli','$ls_nomcli','$ls_forpagfac','$ls_obsfac','$ld_monsubtot','$ld_monbasimp','$ld_monimp','$ld_montot','$ls_usuario','$ls_trabajador');\">".$ls_numfactura."</a></td>";
+					break;
+					
+					case "REPORTE-DESDE":
+						print "<td align='center'><a href=\"javascript: ue_aceptar_reporte_desde('$ls_numordcom');\">".$ls_numordcom."</a></td>";
+					break;
+					
+					case "REPORTE-HASTA":
+						print "<td align='center'><a href=\"javascript: ue_aceptar_reporte_hasta('$ls_numordcom');\">".$ls_numordcom."</a></td>";
+					break;
+				}
+			   
+			   print "<td style=text-align:left>".$ls_nomcli."</td>";
+	 		   print "<td align='center'>".$ls_estatus."</td>";
+			   print "<td align='left'>".$ld_fecfactura."</td>";
+			   print "<td align='right'>".$ld_montot."</td>";
+			   print "</tr>";			
+			}
+			$io_sql->free_result($rs_data);
+		}
+		else
+		{
+			$io_msg->message("No hay registros");
+		}
+	}
+	print "</table>";
+?>
+</div>
+</form>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</body>
+<script language="JavaScript">
+	function ue_catalogo_cliente()
+	{
+		window.open("tepuy_sfa_cat_cliente.php","_blank","menubar=no,toolbar=no,scrollbars=no,width=600,height=400,resizable=yes,location=no");
+	}
+
+
+	function aceptar(ls_numfactura,ls_estfac,ls_fecfactura,ls_cedcli,ls_nomcli,ls_forpagfac,ls_obsfac,
+ls_monsubtot,ls_monbasimp,ls_monimp,ls_montot,ls_usuario,ls_trabajador)
+	{
+
+		opener.document.formulario.txtnumfactura.value=ls_numfactura;
+		opener.document.formulario.txtnumfactura.readonly=false; //true
+		opener.document.formulario.txtcedcli.value	=ls_cedcli;
+		opener.document.formulario.txtnomcli.value	=ls_nomcli;
+		opener.document.formulario.txtfecfactura.value=ls_fecfactura;
+		opener.document.formulario.txtobsfactura.value=   ls_obsfac;
+//alert("aqui");
+		opener.document.formulario.cmbforpag.value=   ls_forpagfac;
+
+		//opener.document.formulario.txteximinpro.value=li_minpro;
+		
+		
+		//opener.document.formulario.hidstatusc.value="C";
+		parametros="";
+		parametros=parametros+"&numfactura="+ls_numfactura;
+		parametros=parametros+"&subtotal="+ls_monsubtot+"&cargos="+ls_monimp+"&total="+ls_montot;
+		proceso="LOADFACTURA";
+		
+		// Div donde se van a cargar los resultados
+		divgrid = document.getElementById("bienesservicios");
+
+		ajax=objetoAjax();
+
+		ajax.open("POST","class_folder/tepuy_sfa_c_factura_ajax.php",true);
+		alert("aqui");
+		ajax.onreadystatechange=function() {
+			if (ajax.readyState==4) {
+				divgrid.innerHTML = ajax.responseText
+			}
+		}
+		ajax.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+		// Enviar todos los campos a la pagina para que haga el procesamiento
+		ajax.send("proceso="+proceso+""+parametros);
+		//close();
+
+	}
+	
+	function ue_search()
+  	{
+		f=document.formulario;
+		f.operacion.value="BUSCAR";
+		f.action="tepuy_sfa_cat_factura.php";
+		f.submit();
+	}
+</script>
+</html>

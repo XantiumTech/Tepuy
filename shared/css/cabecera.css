@@ -1,0 +1,50 @@
+.contorno{
+	background-color:#ffffff; /*ffffff=Gris */
+	border: 1px solid #BBBBBB; /*BBBBBB=Gris */
+}
+.cd-menu {background-color: #F7F7F7;}   /*F7F7F7=Gris */
+.cd-logo {background-color: ##320ED3;}.toolbar {  /* 320ED3= Azul  #cc3433=Rojo*/
+	font-family: Tahoma, Verdana, Arial;
+	font-size: 11px;
+	font-weight: normal;
+	color: #909090;  /* 909090 Gris*/
+	background-color: #FFFFFF;
+}
+.pie-pagina{
+	font-family: Tahoma, Verdana, Arial;
+	font-size: 9px;
+	font-weight: normal;
+	color: #666666; /* 666666 Gris Oscuro */
+	background-color: #EAEAEA; /* EAEAEA Gris Claro */
+	text-align: center;
+	padding-top: 2px;
+	padding-right: 15px;
+	padding-bottom: 2px;
+	padding-left: 15px;
+}
+.formato-blancotabla {
+	font-family: Tahoma, Verdana, Arial;
+	font-size: 11px;
+	font-weight: normal;
+	color: #000000; /* 000000 Negro*/
+	background-color: #ffffff;
+	border: 1px solid #000000;
+	padding: 5px;
+	margin-right: 0px;
+	right: 20px;
+}
+.sin-bordebackdoor {
+
+	border:none;
+	color:#18599C;
+	cursor:pointer;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	background-color: #18599C; /* 18599C Azul */
+	font-size: 12px;
+}
+.descripcion_sistema {
+	font-weight: bold;
+	font-size: 12px;
+	color: #0D40F7; /* CC0000 Rojo*/
+}

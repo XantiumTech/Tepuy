@@ -1,0 +1,607 @@
+<?php
+class tepuy_mis_c_contabiliza
+{
+    	var $is_msg_error;
+	var $dts_empresa; 
+	var $dts_solicitud;
+	var $obj="";
+	var $io_sql;
+	var $io_include;
+	var $io_connect;
+	var $io_function;	
+	var $io_mensajes;
+	var $io_fun_scg;
+
+
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	function tepuy_mis_c_contabiliza()
+	{
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	     Function: tepuy_mis_c_contabiliza
+		//		   Access: public 
+		//	  Description: Constructor de la Clase
+		//	   Creado Por: Juniors Fraga
+		// Modificado Por: Ing. Miguel Palencia					Fecha de creación : 18/01/2017
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		require_once("../shared/class_folder/class_sql.php");  
+		require_once("../shared/class_folder/tepuy_include.php");
+		require_once("../shared/class_folder/class_funciones.php");
+		require_once("../shared/class_folder/class_mensajes.php");
+		require_once("../shared/class_folder/class_fecha.php");
+		require_once("../shared/class_folder/class_datastore.php");
+		require_once("class_folder/class_funciones_scg.php");
+		$this->io_function=new class_funciones() ;
+		$this->io_include=new tepuy_include();
+		$this->io_connect=$this->io_include->uf_conectar();
+		$this->io_sql=new class_sql($this->io_connect);		
+		$this->dts_empresa=$_SESSION["la_empresa"];
+		$this->io_mensajes=new class_mensajes();		
+		$this->io_fecha=new class_fecha();		
+		$this->dts_solicitud=new class_datastore();
+		$this->io_fun_scg=new class_funciones_scg(); //$io_fun_scg
+		
+	}// end function tepuy_mis_c_contabiliza
+	//-----------------------------------------------------------------------------------------------------------------------------------
+
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	function uf_init_niveles(&$ia_niveles_scg)
+	{	///////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	   Function: uf_init_niveles
+		//	     Access: public
+		//	    Returns: vacio	 
+		//	Description: Este método realiza una consulta a los formatos de las cuentas
+		//               para conocer los niveles de la escalera de las cuentas contables  
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		$ls_formato=""; $li_posicion=0; $li_indice=0;
+		$dat_emp=$_SESSION["la_empresa"];
+		//contable
+		$ls_formato = trim($dat_emp["formcont"])."-";
+		$li_posicion = 1 ;
+		$li_indice   = 1 ;
+		$li_posicion = $this->io_function->uf_posocurrencia($ls_formato, "-" , $li_indice ) - $li_indice;
+		do
+		{
+			$ia_niveles_scg[$li_indice] = $li_posicion;
+			$li_indice   = $li_indice+1;
+			$li_posicion = $this->io_function->uf_posocurrencia($ls_formato, "-" , $li_indice ) - $li_indice;
+		} while ($li_posicion>=0);
+	}// end function uf_init_niveles formspi
+
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	function uf_init_niveles_ingresos(&$ia_niveles_ing)
+	{	///////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	   Function: uf_init_niveles
+		//	     Access: public
+		//	    Returns: vacio	 
+		//	Description: Este método realiza una consulta a los formatos de las cuentas
+		//               para conocer los niveles de la escalera de las cuentas contables  
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		$ls_formato=""; $li_posicion=0; $li_indice=0;
+		$dat_emp=$_SESSION["la_empresa"];
+		//contable
+		$ls_formato = trim($dat_emp["formspi"])."-";
+		$li_posicion = 1 ;
+		$li_indice   = 1 ;
+		$li_posicion = $this->io_function->uf_posocurrencia($ls_formato, "-" , $li_indice ) - $li_indice;
+		do
+		{
+			$ia_niveles_ing[$li_indice] = $li_posicion;
+			$li_indice   = $li_indice+1;
+			$li_posicion = $this->io_function->uf_posocurrencia($ls_formato, "-" , $li_indice ) - $li_indice;
+		} while ($li_posicion>=0);
+	}// end function uf_init_niveles formspi
+
+
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	function uf_select_facturas_contabilizar($as_fecdoc,&$ao_object,&$ai_totrows,&$ai_filadebe,&$ai_filahaber,&$ai_filaingreso,$as_estatus)
+	{
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	     Function: uf_select_facturas_contabilizar
+		//		   Access: public (tepuy_mis_p_contabiliza_sfa.php, tepuy_mis_p_reverso_sfa.php,
+		//	    Arguments: as_numdoc  // Número de Documento
+		//	   			 as_fecdoc  // Fecha del documento
+		//				   ao_object  // Arreglo de objetos
+		//				   ai_totrows  // Total de Filas
+		//				   ai_estatus  // estatus de las facturas a consultar
+		//	      Returns: lb_valido True si se ejecuto la busqueda correctamente
+		//	  Description: Funcion que obtiene todas aquellas facturas en estatus para su contabilizacion
+		// Creado Por: Ing. Miguel Palencia					Fecha Creación : 18/01/2017
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        	$lb_valido=true;
+		$ai_totrows=0;
+		$ai_totaldebe=0;
+		$ai_totalhaber=0;
+		$ia_niveles_scg[0]="";
+		$ia_niveles_ing[0]="";
+		$this->uf_init_niveles($ia_niveles_scg);
+		$this->uf_init_niveles_ingresos($ia_niveles_ing);
+		$li_totalnivel=count($ia_niveles_scg)-1;
+		$li_totalnivel_ing=count($ia_niveles_ing)-1;
+		//print "Total Niveles: ".$li_totalnivel;
+		$ls_codemp=$this->dts_empresa["codemp"];
+		$ordenado=" ORDER BY sc_cuenta ASC ";
+		if(!empty($as_fecdoc))
+		{
+			$as_fecdoc=$this->io_function->uf_convertirdatetobd($as_fecdoc);
+			$ls_criterio=$ls_criterio." AND fecfactura = '".$as_fecdoc."'";
+		}
+		$ls_sql=" SELECT sfa_configuracion.scg_cuenta_iva, scg_cuentas.denominacion FROM sfa_configuracion ".
+			"INNER JOIN scg_cuentas ON sfa_configuracion.scg_cuenta_iva=scg_cuentas.sc_cuenta ".
+			" WHERE sfa_configuracion.codemp='".$ls_codemp."' ";
+		//print $ls_sql;
+		$rs_data=$this->io_sql->select($ls_sql);
+		if($rs_data===false)
+		{
+            		$this->io_mensajes->message("CLASE->Contabiliza MÉTODO->uf_select_factura_contabilizar ERROR->".$this->io_function->uf_convertirmsg($this->io_sql->message));
+			$lb_valido=false;
+		}
+		else
+		{
+			// CUENTAS CREDITO FISCAL IVA //
+			while($row=$this->io_sql->fetch_row($rs_data))
+			{
+				$ls_scg_cuenta_iva=rtrim($row["scg_cuenta_iva"]);
+				$ls_scg_den_cuenta_iva=rtrim($row["denominacion"]);
+			}
+			$li_totfil=0;
+			$as_cuenta="";
+			for($li=$li_totalnivel;$li>1;$li--)
+			{
+				$li_ant=$ia_niveles_scg[$li-1];
+				$li_act=$ia_niveles_scg[$li];
+				$li_fila=$li_act-$li_ant;
+				$li_len=strlen($ls_scg_cuenta_iva);
+				$li_totfil=$li_totfil+$li_fila;
+				$li_inicio=$li_len-$li_totfil;
+				if($li==$li_totalnivel)
+				{
+					$as_cuenta=substr($ls_scg_cuenta_iva,$li_inicio,$li_fila);
+				}
+				else
+				{
+					$as_cuenta=substr($ls_scg_cuenta_iva,$li_inicio,$li_fila)."-".$as_cuenta;
+				}
+			}
+			$li_fila=$ia_niveles_scg[1]+1;
+			$as_cuenta=substr($ls_scg_cuenta_iva,0,$li_fila)."-".$as_cuenta;
+			$ls_scg_cuenta_iva_aux=$as_cuenta;
+			// FIN CUENTAS CREDITO FISCAL IVA //
+
+			// CUENTAS COBRADAS Y X COBRAR ( DEBE )//
+			$this->io_sql->free_result($rs_data);
+		// BUSCA LA CUENTA  CONTABLE EN EL CLIENTE //
+			/*$ls_sql=" SELECT SUM(sfa_factura.monsubtot) AS monsubtot, SUM(sfa_factura.monimp) AS monimp,sfa_cliente.sc_cuenta, scg_cuentas.denominacion FROM sfa_factura ".
+				"INNER JOIN sfa_cliente ON sfa_factura.cedcli=sfa_cliente.cedcli ".
+				"INNER JOIN scg_cuentas ON sfa_cliente.sc_cuenta=scg_cuentas.sc_cuenta". */
+		// FIN DE LA BUSQUEDA DE CUENTA CONTABLE EN EL CLIENTE //
+		// BUSCA LA CUENTA CONTABLE EN LA FORMA DE PAGO //
+			$ls_sql=" SELECT SUM(sfa_factura.monsubtot) AS monsubtot, SUM(sfa_factura.monimp) AS monimp, ".
+				"sfa_factura.forpagfac, sfa_formapago.sc_cuenta, scg_cuentas.denominacion FROM sfa_factura ".
+				" INNER JOIN sfa_formapago ON sfa_factura.forpagfac=sfa_formapago.codfor ".
+				" INNER JOIN scg_cuentas ON sfa_formapago.sc_cuenta=scg_cuentas.sc_cuenta ".
+				" WHERE sfa_factura.codemp='".$ls_codemp."' ".
+				"   AND sfa_factura.estfac='".$as_estatus."' ".
+				" AND sfa_factura.fecfactura = '".$as_fecdoc."'".
+				" GROUP BY sfa_formapago.sc_cuenta ASC";
+			//	" GROUP BY sfa_cliente.sc_cuenta ASC";
+			//print $ls_sql;			
+			$rs_data=$this->io_sql->select($ls_sql);
+			if($rs_data===false)
+			{
+            			$this->io_mensajes->message("CLASE->Contabiliza MÉTODO->uf_select_factura_contabilizar ERROR->".$this->io_function->uf_convertirmsg($this->io_sql->message));
+				$lb_valido=false;
+			}
+			else
+			{
+				$ls_monimp=0;
+				while($row=$this->io_sql->fetch_row($rs_data))
+				{
+					$ls_codcuentascg=rtrim($row["sc_cuenta"]);
+					$ls_dencuentascg=trim($row["denominacion"]);
+					$ls_monsubtot=rtrim($row["monsubtot"]);
+					$ls_monimpaux=rtrim($row["monimp"]);
+					$ls_monimp=$ls_monimp+$ls_monimpaux;
+					$ai_totaldebe=$ai_totaldebe+$ls_monsubtot;
+					$ls_monsubtot=	number_format($ls_monsubtot,2,",",".");
+					$ls_codcuentascg=rtrim($row["sc_cuenta"]);
+					$ai_totrows=$ai_totrows+1;
+					$li_totfil=0;
+					$as_cuenta="";
+					for($li=$li_totalnivel;$li>1;$li--)
+					{
+						$li_ant=$ia_niveles_scg[$li-1];
+						$li_act=$ia_niveles_scg[$li];
+						$li_fila=$li_act-$li_ant;
+						$li_len=strlen($ls_codcuentascg);
+						$li_totfil=$li_totfil+$li_fila;
+						$li_inicio=$li_len-$li_totfil;
+						if($li==$li_totalnivel)
+						{
+							$as_cuenta=substr($ls_codcuentascg,$li_inicio,$li_fila);
+						}
+						else
+						{
+							$as_cuenta=substr($ls_codcuentascg,$li_inicio,$li_fila)."-".$as_cuenta;
+						}
+					}
+					$li_fila=$ia_niveles_scg[1]+1;
+					$as_cuenta=substr($ls_codcuentascg,0,$li_fila)."-".$as_cuenta;
+					$ls_scg_cuenta=$as_cuenta;
+				//	$ao_object[$ai_totrows][1]="<input type=checkbox name=chksel".$ai_totrows." id=chksel".$ai_totrows." value=1 style=width:15px;height:15px onclick=javascript:ue_cargarconcepto(".$ai_totrows.");>";		
+					$ao_object[$ai_totrows][1]="<input type=hidden name=txtcuentascg".$ai_totrows." value='".$ls_codcuentascg."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+					$ao_object[$ai_totrows][2]="<input type=text name=txtcuentascg1".$ai_totrows." value='".$ls_scg_cuenta."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+					$ao_object[$ai_totrows][3]="<input type=text name=ttxtdencuentascg".$ai_totrows." value='".$ls_dencuentascg."' class=sin-borde style=text-align:left size=60 maxlength=60 readonly>";
+					$ao_object[$ai_totrows][4]="<input type=text name=txtmontotaldebe".$ai_totrows." value='".$ls_monsubtot."' title='".$ls_conmov."' style=text-align:right class=sin-borde size=20 maxlength=20 readonly>";
+				}
+				$ai_filadebe=$ai_totrows;
+				// INCORPORA CUENTA CREDITO FISCAL ( DEBE )//
+		/*		if ($ls_monimp>0)
+				{
+					$ai_totrows=$ai_totrows+1;
+					$ai_totaldebe=$ai_totaldebe+$ls_monimp;
+					$ls_monimp=number_format($ls_monimp,2,",",".");
+				//	$ao_object[$ai_totrows][1]="<input type=checkbox name=chksel".$ai_totrows." id=chksel".$ai_totrows." value=1 style=width:15px;height:15px onclick=javascript:ue_cargarconcepto(".$ai_totrows.");>";		
+					$ao_object[$ai_totrows][1]="<input type=hidden name=txtcuentascg".$ai_totrows." value='".$ls_scg_cuenta_iva."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+					$ao_object[$ai_totrows][2]="<input type=text name=txtcuentascg1".$ai_totrows." value='".$ls_scg_cuenta_iva_aux."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+					$ao_object[$ai_totrows][3]="<input type=text name=ttxtdencuentascg".$ai_totrows." value='".$ls_scg_den_cuenta_iva."' class=sin-borde style=text-align:left size=60 maxlength=60 readonly>";
+					$ao_object[$ai_totrows][4]="<input type=text name=txtmontotaldebe".$ai_totrows." value='".$ls_monimp."' title='".$ls_conmov."' style=text-align:right class=sin-borde size=20 maxlength=20 readonly>";
+				}*/
+				// FIN INCORPORA CUENTA CREDITO FISCAL ( DEBE )//
+
+			// FIN CUENTAS COBRADAS Y X COBRAR ( DEBE )//
+				$this->io_sql->free_result($rs_data);
+				/*	$ls_sql="SELECT sfa_factura.*, ".
+				" (SELECT nomcli FROM sfa_cliente ".
+					"          WHERE sfa_cliente.cedcli=sfa_factura.cedcli) AS nomcli,".
+				" (SELECT apecli FROM sfa_cliente ".
+					"          WHERE sfa_cliente.cedcli=sfa_factura.cedcli) AS apecli ".
+                		"  FROM sfa_factura ".
+					" WHERE codemp='".$ls_codemp."' ".
+					"   AND estfac='".$as_estatus."' ".
+					//" AND fecfactura >= '".$as_fecdoc."' AND fecfactura <= '".$as_fecdoc."'".
+					  $ls_criterio.$ordenado; */
+				$ls_sql="SELECT sfa_producto.codpro,sfa_producto.denpro,sfa_producto.spi_cuenta,sfa_producto.sc_cuenta, ".
+					" (SELECT denominacion FROM scg_cuentas ".
+					"          WHERE sfa_producto.sc_cuenta=scg_cuentas.sc_cuenta) AS dencuentascg,".
+					"      (SELECT SUM(monsubpro) FROM sfa_dt_factura".
+					"        WHERE sfa_dt_factura.monsubpro >0 AND sfa_dt_factura.codpro=sfa_producto.codpro AND numfactura IN (SELECT numfactura FROM sfa_factura WHERE sfa_factura.estfac!='3' AND fecfactura >= '".$as_fecdoc."' AND fecfactura <= '".$as_fecdoc."')) AS monfacpro, ".
+					"      (SELECT SUM(moncarpro) FROM sfa_dt_factura".
+					"        WHERE sfa_dt_factura.moncarpro >0 AND sfa_dt_factura.codpro=sfa_producto.codpro AND numfactura IN (SELECT numfactura FROM sfa_factura WHERE sfa_factura.estfac!='3' AND fecfactura >= '".$as_fecdoc."' AND fecfactura <= '".$as_fecdoc."')) AS monfacproiva ".
+                			"  FROM sfa_producto ".
+					" WHERE codemp='".$ls_codemp."' ".
+					  $ordenado; 
+				//print $ls_sql; //die();
+				$rs_data=$this->io_sql->select($ls_sql);
+				if($rs_data===false)
+				{
+            				$this->io_mensajes->message("CLASE->Contabiliza MÉTODO->uf_select_factura_contabilizar ERROR->".$this->io_function->uf_convertirmsg($this->io_sql->message));
+					$lb_valido=false;
+				}
+				else
+				{
+					// INCORPORA CUENTAS DE INGRESOS ( HABER )//
+					$ls_fecact=date("Y-m-d");
+					$ls_monimp=0;
+					while($row=$this->io_sql->fetch_row($rs_data))
+					{
+						$ls_monfacpro=rtrim($row["monfacpro"]);
+						if ($ls_monfacpro>0)
+						{
+							$ai_totalhaber=$ai_totalhaber+$ls_monfacpro;
+							$ls_monfacpro=	number_format($ls_monfacpro,2,",",".");
+							$ls_codcuentascg=rtrim($row["sc_cuenta"]);
+							$ls_dencuentascg=trim($row["dencuentascg"]);
+							$ls_monfacproiva=rtrim($row["monfacproiva"]);
+							$ls_monimp=$ls_monimp+$ls_monfacproiva;
+							$ai_totrows=$ai_totrows+1;
+							$li_totfil=0;
+							$as_cuenta="";
+							for($li=$li_totalnivel;$li>1;$li--)
+							{
+								$li_ant=$ia_niveles_scg[$li-1];
+								$li_act=$ia_niveles_scg[$li];
+								$li_fila=$li_act-$li_ant;
+								$li_len=strlen($ls_codcuentascg);
+								$li_totfil=$li_totfil+$li_fila;
+								$li_inicio=$li_len-$li_totfil;
+								if($li==$li_totalnivel)
+								{
+									$as_cuenta=substr($ls_codcuentascg,$li_inicio,$li_fila);
+								}
+								else
+								{
+									$as_cuenta=substr($ls_codcuentascg,$li_inicio,$li_fila)."-".$as_cuenta;
+								}
+							}
+							$li_fila=$ia_niveles_scg[1]+1;
+							$as_cuenta=substr($ls_codcuentascg,0,$li_fila)."-".$as_cuenta;
+							$ls_scg_cuenta=$as_cuenta;
+				//			$ao_object[$ai_totrows][1]="<input type=checkbox name=chksel".$ai_totrows." id=chksel".$ai_totrows." value=1 style=width:15px;height:15px onclick=javascript:ue_cargarconcepto(".$ai_totrows.");>";		
+							$ao_object[$ai_totrows][1]="<input type=hidden name=txtcuentascg".$ai_totrows." value='".$ls_codcuentascg."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+							$ao_object[$ai_totrows][2]="<input type=text name=txtcuentascg1".$ai_totrows." value='".$ls_scg_cuenta."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+							$ao_object[$ai_totrows][3]="<input type=text name=ttxtdencuentascg".$ai_totrows." value='".$ls_dencuentascg."' class=sin-borde style=text-align:left size=60 maxlength=60 readonly>";
+							$ao_object[$ai_totrows][5]="<input type=text name=txtmontotalhaber".$ai_totrows." value='".$ls_monfacpro."' title='".$ls_conmov."' style=text-align:right class=sin-borde size=20 maxlength=20 readonly>";
+				//			$ao_object[$ai_totrows][6]="<div align='center'><a href=javascript:uf_verdetalle('".$ls_monfacproiva."');><img src=../shared/imagebank/mas.gif alt=Detalle width=12 height=24 border=0></a></div>";
+						}
+					}
+					$ai_filahaber=$ai_totrows;
+					// FIN INCORPORA CUENTAS DE INGRESOS ( HABER )//
+					// INCORPORA CUENTA CREDITO FISCAL ( HABER )//
+					if ($ls_monimp>0)
+					{
+						$ai_totrows=$ai_totrows+1;
+						$ai_totalhaber=$ai_totalhaber+$ls_monimp;
+						$ls_monimp=number_format($ls_monimp,2,",",".");
+						$ao_object[$ai_totrows][1]="<input type=hidden name=txtcuentascg".$ai_totrows." value='".$ls_scg_cuenta_iva."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+						$ao_object[$ai_totrows][2]="<input type=text name=txtcuentascg1".$ai_totrows." value='".$ls_scg_cuenta_iva_aux."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+						$ao_object[$ai_totrows][3]="<input type=text name=ttxtdencuentascg".$ai_totrows." value='".$ls_scg_den_cuenta_iva."' class=sin-borde style=text-align:left size=60 maxlength=60 readonly>";
+						$ao_object[$ai_totrows][5]="<input type=text name=txtmontotalhaber".$ai_totrows." value='".$ls_monimp."' title='".$ls_conmov."' style=text-align:right class=sin-borde size=20 maxlength=20 readonly>";
+					}
+					// FIN INCORPORA CUENTA CREDITO FISCAL ( HABER )//
+					// TOTALES //
+					$ai_totrows=$ai_totrows+1;
+					$ai_totaldebe=	number_format($ai_totaldebe,2,",",".");
+					$ai_totalhaber=	number_format($ai_totalhaber,2,",",".");
+					$ao_object[$ai_totrows][1]="<input type=hidden name=txtcuentascg".$ai_totrows." value='".""."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+					$ao_object[$ai_totrows][2]="<input type=text name=txtcuentascg1".$ai_totrows." value='".""."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+					$ao_object[$ai_totrows][3]="<input type=text name=ttxtdencuentascg".$ai_totrows." value='"."TOTALES"."' class=sin-borde style=text-align:right size=60 maxlength=60 readonly>";
+					$ao_object[$ai_totrows][4]="<input type=text name=txtmontotaldebe".$ai_totrows." value='".$ai_totaldebe."' title='".$ls_conmov."' style=text-align:right class=sin-borde size=20 maxlength=20 readonly class='letras-negrita'>";
+					$ao_object[$ai_totrows][5]="<input type=text name=txtmontotalhaber".$ai_totrows." value='".$ai_totalhaber."' title='".$ls_conmov."' style=text-align:right class=sin-borde size=20 maxlength=20 readonly class='letras-negrita'>";
+					$ai_filaingreso=$ai_totrows+1;
+					// FIN DE TOTALES //
+					$this->io_sql->free_result($rs_data);
+				} // if de busqueda de cuentas x HABER
+				// BUSCA LA CUENTA DESDE LA CUENTAS DE PRESUPUESTO DE INGRESO X PRODUCTO //
+		/*	$ls_sql=" SELECT SUM(sfa_factura.monsubtot) AS monsubtot, SUM(sfa_factura.monimp) AS monimp, ".
+				" spi_cuentas.spi_cuenta, spi_cuentas.denominacion  ".
+				" FROM sfa_factura, sfa_dt_factura, sfa_producto, spi_cuentas ".
+				" WHERE sfa_factura.codemp='".$ls_codemp."' ".
+				"   AND sfa_factura.estfac='".$as_estatus."' ".
+				" AND sfa_factura.fecfactura = '".$as_fecdoc."'".
+				" AND sfa_factura.codemp=sfa_dt_factura.codemp AND sfa_factura.numfactura=sfa_dt_factura.numfactura ".
+				" AND sfa_dt_factura.codemp=sfa_producto.codemp AND sfa_dt_factura.codpro=sfa_producto.codpro ".
+				" AND sfa_producto.codemp=spi_cuentas.codemp AND sfa_producto.spi_cuenta=spi_cuentas.spi_cuenta ".
+				" GROUP BY spi_cuentas.spi_cuenta ASC";*/
+
+			$ls_sql=" SELECT SUM(dt.monsubpro) AS monsubtot, SUM(dt.moncarpro) AS monimp, p.spi_cuenta, c.denominacion FROM sfa_dt_factura dt ".
+				" INNER JOIN sfa_factura f ON dt.numfactura=f.numfactura ".
+				" INNER JOIN sfa_producto p ON dt.codpro=p.codpro ".
+				" INNER JOIN spi_cuentas c ON p.spi_cuenta=c.spi_cuenta ".
+				" WHERE f.codemp='".$ls_codemp."' ".
+				"   AND f.estfac='".$as_estatus."' ".
+				" AND f.fecfactura = '".$as_fecdoc."'".
+				" GROUP BY p.spi_cuenta ASC";
+
+				//print $ls_sql;			
+				$rs_data=$this->io_sql->select($ls_sql);
+				if($rs_data===false)
+				{
+					$this->io_mensajes->message("CLASE->Contabiliza MÉTODO->uf_select_factura_contabilizar ERROR->".$this->io_function->uf_convertirmsg($this->io_sql->message));
+				$lb_valido=false;
+				}
+				else
+				{
+					while($row=$this->io_sql->fetch_row($rs_data))
+					{
+						$ls_codcuentascg=rtrim($row["spi_cuenta"]);
+						$ls_dencuentascg=trim($row["denominacion"]);
+						$ls_monsubtot=rtrim($row["monsubtot"]);
+						$ls_monimpaux=rtrim($row["monimp"]);
+						$ls_monimp=$ls_monimp+$ls_monimpaux;
+						$ai_totaldebe=$ai_totaldebe+$ls_monsubtot;
+						$ls_monsubtot=	number_format($ls_monsubtot,2,",",".");
+						//$ls_codcuentascg=rtrim($row["sc_cuenta"]);
+						$ai_totrows=$ai_totrows+1;
+						$li_totfil=0;
+						$as_cuenta="";
+						for($li=$li_totalnivel_ing;$li>1;$li--)
+						{
+							$li_ant=$ia_niveles_ing[$li-1];
+							$li_act=$ia_niveles_ing[$li];
+							$li_fila=$li_act-$li_ant;
+							$li_len=strlen($ls_codcuentascg);
+							$li_totfil=$li_totfil+$li_fila;
+							$li_inicio=$li_len-$li_totfil;
+							if($li==$li_totalnivel)
+							{
+								$as_cuenta=substr($ls_codcuentascg,$li_inicio,$li_fila);
+							}
+							else
+							{
+								$as_cuenta=substr($ls_codcuentascg,$li_inicio,$li_fila)."-".$as_cuenta;
+							}
+						}
+						$li_fila=$ia_niveles_scg[1]+1;
+						$as_cuenta=substr($ls_codcuentascg,0,$li_fila)."-".$as_cuenta;
+						$ls_scg_cuenta=$as_cuenta;
+						$ao_object[$ai_totrows][1]="<input type=hidden name=txtcuentascg".$ai_totrows." value='".$ls_codcuentascg."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+						$ao_object[$ai_totrows][2]="<input type=text name=txtcuentascg1".$ai_totrows." value='".$ls_scg_cuenta."' class=sin-borde style=text-align:center size=20 maxlength=15 readonly>";
+						$ao_object[$ai_totrows][3]="<input type=text name=ttxtdencuentascg".$ai_totrows." value='".$ls_dencuentascg."' class=sin-borde style=text-align:left size=60 maxlength=60 readonly>";
+						$ao_object[$ai_totrows][4]="<input type=text name=txtmontotaldebe".$ai_totrows." value='".$ls_monsubtot."' title='".$ls_conmov."' style=text-align:right class=sin-borde size=20 maxlength=20 readonly>";
+					}
+				} // if busqueda de cuentas x DEBE
+			} // if busqueda de cuentas x DEBE
+		} //if sfa_configuracion
+		return $lb_valido;
+	}// end function uf_select_facturas_contabilizar	
+	//-----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	function uf_select_comprobantes_spi($as_comprobante,$as_procede,$ad_fecha,$ai_estatus,&$ao_object,&$ai_totrows)
+	{
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	     Function: uf_select_comprobantes_spi
+		//		   Access: public (tepuy_mis_p_contabiliza_mp_spi.php)
+		//	    Arguments: as_comprobante  // Número de Comprobante
+		//				   as_procede  // Procede
+		//				   ad_fecha  // Fecha del Comprobante
+		//				   ai_estatus  // Estatus de Conatbilización
+		//				   ao_object  // Arreglo de objetos
+		//				   ai_totrows  // total del Filas
+		//	      Returns: lb_valido True si se ejecuto la contabilización correctamente
+		//	  Description: Funcion que se encarga de retornar los comprobantes de modificaciones 
+		//					presupuestarias para su proceso de aprobacion .
+		//	   Creado Por: Ing. Miguel Palencia
+		// Modificado Por: 													Fecha Última Modificación : 
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		$ai_totrows=0;
+		$ls_codemp=$this->dts_empresa["codemp"];
+		$ls_criterio="";
+		if($ad_fecha!="")
+		{
+			$ls_criterio=$ls_criterio." AND fecha ='".$this->io_function->uf_convertirdatetobd($ad_fecha)."'";
+		}
+		if($as_comprobante!="")
+		{
+			$ls_criterio=$ls_criterio." AND comprobante like '%".$as_comprobante."%'";
+		}
+		if($as_procede!="")
+		{
+			$ls_criterio=$ls_criterio." AND procede like '%SPI".$as_procede."%'";
+		}
+		else
+		{
+			$ls_criterio=$ls_criterio." AND procede like '%SPI%'";		
+		}
+		$ls_sql="SELECT comprobante, fecha, procede, descripcion, fechaconta, fechaanula ". 
+				"  FROM tepuy_cmp_md ".
+				" WHERE codemp = '".$ls_codemp."' ".
+				"   AND tipo_comp = 2 ".
+				"   AND estapro = ".$ai_estatus." ".
+				$ls_criterio.
+			    " ORDER BY fecha, comprobante ";	
+		$rs_data = $this->io_sql->select($ls_sql);
+		
+		if($rs_data===false)
+		{
+			$lb_valido=false;
+            $this->io_mensajes->message("CLASE->Contabiliza MÉTODO->uf_select_comprobantes_spi ERROR->".$this->io_function->uf_convertirmsg($this->io_sql->message));			
+		}
+		else
+		{
+			while($row=$this->io_sql->fetch_row($rs_data))
+			{
+				$ai_totrows=$ai_totrows+1;
+				$ls_comprobante=rtrim($row["comprobante"]);
+				$ld_fecha=$this->io_function->uf_convertirfecmostrar($row["fecha"]);
+				$ls_procede=rtrim($row["procede"]);
+				$ls_descripcion=rtrim($row["descripcion"]);				
+				$ld_fechaconta=rtrim($row["fechaconta"]);
+				$ld_fechaanula=rtrim($row["fechaanula"]);
+				$ao_object[$ai_totrows][1] = "<input type=checkbox name=chksel".$ai_totrows."  id=chksel".$ai_totrows." value=1 >";		
+				$ao_object[$ai_totrows][2] = "<input type=text name=txtcomprobante".$ai_totrows." id=txtcomprobante".$ai_totrows."  value='".$ls_comprobante."'      class=sin-borde readonly style=text-align:center size=20 maxlength=15 >";
+				$ao_object[$ai_totrows][3] = "<input type=text name=txtfecha".$ai_totrows." id=txtfecha".$ai_totrows."  value='".$ld_fecha."'    class=sin-borde readonly style=text-align:center size=15 maxlength=12 >";
+				$ao_object[$ai_totrows][4] = "<input type=text name=txtdescripcion".$ai_totrows." id=txtdescripcion".$ai_totrows." value='".$ls_descripcion."' title='".$ls_descripcion."'    class=sin-borde readonly style=text-align:left size=50 maxlength=250>";			
+				$ao_object[$ai_totrows][5] = "<div align='center'><a href=javascript:uf_verdetalle('".$ls_comprobante."','".$ls_procede."');><img src=../shared/imagebank/mas.gif alt=Detalle width=12 height=24 border=0></a></div>".
+											 "<input name=txtprocede".$ai_totrows." type=hidden id=txtprocede".$ai_totrows." class=sin-borde  value='".$ls_procede."' size=15 maxlength=12>".			
+										     "<input type=hidden name=txtfechaconta".$ai_totrows." id=txtfechaconta".$ai_totrows." value='".$ld_fechaconta."'>".
+										     "<input type=hidden name=txtfechaanula".$ai_totrows." id=txtfechaanula".$ai_totrows." value='".$ld_fechaanula."'>";
+			}
+			$this->io_sql->free_result($rs_data);
+		}		
+	}// end function uf_select_comprobantes_spi
+	//-----------------------------------------------------------------------------------------------------------------------------------
+
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	function uf_procesar_contabilizacion_sfa_spi_insert($as_procede,$as_comprobante,$ad_fecha,$as_cuenta,$as_operacion,$as_descripcion,$as_codban,$as_ctaban,$adec_monto,$ai_orden)
+	{
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	     Function: uf_procesar_contabilizacion_sfa_spi_insert
+		//		   Access: public
+		//	    Arguments: as_comprobante  // Número de Comprobante
+		//				   ad_fecha  // Fecha del Comprobante
+		//	      Returns: lb_valido True si se ejecuto la contabilización correctamente
+		//	  Description: Funcion que se encarga de contabilizar el comprobante de ingresos
+		//	   Creado Por: Ing. Miguel Palencia
+		// Creado el: 13/02/2017
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		$ls_codemp=$this->dts_empresa["codemp"];
+		$lb_valido=true;
+		$ls_sql=" INSERT INTO spi_dt_cmp (codemp,procede,comprobante,fecha,spi_cuenta,procede_doc,documento,operacion, ".
+		        "                         descripcion,monto,orden,codban,ctaban) ".
+				" VALUES('".$ls_codemp."','".$as_procede."','".$as_comprobante."','".$ad_fecha."', ".
+				"        '".$as_cuenta."','".$as_procede."','".$as_comprobante."','".$as_operacion."','".$as_descripcion."', ".
+				"        ".$adec_monto.",".$ai_orden.",'".$as_codban."','".$as_ctaban."')" ;
+		//print $ls_sql;
+		$li_result=$this->io_sql->execute($ls_sql);
+		if($li_result===false)
+		{
+			$this->is_msg_error="uf_procesar_contabilizacion_sfa_spi_insert ERROR->".$this->io_function->uf_convertirmsg($this->io_sql->message);
+			$lb_valido=false;
+		}
+		$this->io_sql->free_result($rs_data);
+		return $lb_valido;
+
+	}// end function uf_procesar_contabilizacion_sfa_spi_insert
+	//-----------------------------------------------------------------------------------------------------------------------------------	
+
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	function uf_procesar_contabilizar_tepuy_cmp($as_procede,$as_comprobante,$ad_fecha,$as_cuenta,$as_operacion,$as_descripcion,$as_codban,$as_ctaban,$adec_monto,$ai_orden)
+	{
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	     Function: uf_procesar_contabilizar_tepuy_cmp
+		//		   Access: public
+		//	    Arguments: as_comprobante  // Número de Comprobante
+		//				   ad_fecha  // Fecha del Comprobante
+		//				   ao_object  // Arreglo de objetos
+		//				   ai_totrows  // total del Filas
+		//	      Returns: lb_valido True si se ejecuto la contabilización correctamente
+		//	  Description: Funcion que se encarga de retornar los comprobantes de despachos a ser contabilizados
+		//	   Creado Por: Ing. Miguel Palencia
+		// Creado el: 13/02/2017
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		$ls_codemp=$this->dts_empresa["codemp"];
+		$lb_valido=true;
+		$ls_completa="'1', 'B', '----------', '1'";
+		$ls_sql="INSERT INTO `tepuy_cmp` (`codemp`, `procede`, `comprobante`, `fecha`, `codban`, `ctaban`, `descripcion`, `tipo_comp`, `tipo_destino`, `cod_pro`, `ced_bene`, `total`, `numpolcon`, `totalaux`) VALUES ('".
+			$ls_codemp."', '".$as_procede."', '".$as_comprobante."',' ".$ad_fecha."', '".$as_codban."', '".
+			$as_ctaban."', '".$as_descripcion."', ".$ls_completa.", ".$adec_monto.", 0,".$adec_monto." )";
+		$li_result=$this->io_sql->execute($ls_sql);
+		if($li_result===false)
+		{
+			$this->is_msg_error="uf_procesar_contabilizar_tepuy_cmp ERROR->".$this->io_function->uf_convertirmsg($this->io_sql->message);
+			$lb_valido= false;
+		}
+		$this->io_sql->free_result($li_result);
+		return $lb_valido;
+	}// end function uf_procesar_contabilizar_tepuy_cmp
+	//-----------------------------------------------------------------------------------------------------------------------------------
+
+
+	function uf_procesar_contabilizacion_sfa_scg($as_procede,$as_comprobante,$ad_fecha,$as_cuenta,$as_debehaber,$as_descripcion,$as_codban,$as_ctaban,$adec_monto,$ai_orden)
+	{
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	     Function: uf_procesar_contabilizacion_sfa_scg
+		//		   Access: public
+		//	    Arguments: as_comprobante  // Número de Comprobante
+		//				   ad_fecha  // Fecha del Comprobante
+		//				   ao_object  // Arreglo de objetos
+		//				   ai_totrows  // total del Filas
+		//	      Returns: lb_valido True si se ejecuto la contabilización correctamente
+		//	  Description: Funcion que se encarga de retornar los comprobantes de despachos a ser contabilizados
+		//	   Creado Por: Ing. Miguel Palencia
+		// Creado el: 13/02/2017
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		$ls_codemp=$this->dts_empresa["codemp"];
+		$lb_valido=true;
+		$ls_completa="'1', 'B', '----------', '1'";
+		$ls_sql="INSERT INTO `scg_dt_cmp` (`codemp`, `procede`, `comprobante`, `fecha`, `codban`, `ctaban`, `sc_cuenta`, `procede_doc`, `documento`, `debhab`, `descripcion`, `monto`, `orden`, `montoaux`) VALUES ('".
+			$ls_codemp."', '".$as_procede."', '".$as_comprobante."',' ".$ad_fecha."', '".$as_codban."', '".
+			$as_ctaban."', '".$as_cuenta."', '".$as_procede."', '".$as_comprobante."', '".$as_debehaber."', '".$as_descripcion."', ".$adec_monto.", ".$ai_orden.", ".$adec_monto." )";
+		print $ls_sql;
+		$li_result=$this->io_sql->execute($ls_sql);
+		if($li_result===false)
+		{
+			$this->is_msg_error="uf_procesar_contabilizar_sfa_scg ERROR->".$this->io_function->uf_convertirmsg($this->io_sql->message);
+			$lb_valido= false;
+		}
+		$this->io_sql->free_result($li_result);
+		return $lb_valido;
+	}// end functionuf_procesar_contabilizacion_sfa_scg
+	//-----------------------------------------------------------------------------------------------------------------------------------
+
+}
+?>

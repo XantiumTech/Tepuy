@@ -1,0 +1,327 @@
+<?php
+    session_start();   
+	header("Pragma: public");
+	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+	header("Cache-Control: private",false);
+	if(!array_key_exists("la_logusr",$_SESSION))
+	{
+		print "<script language=JavaScript>";
+		print "close();";
+		print "</script>";		
+	}
+	//ini_set('display_errors', 1);
+  	ini_set('memory_limit','1024M');
+	ini_set('max_execution_time ','0');
+
+	//--------------------------------------------------------------------------------------------------------------------------------
+	function uf_print_encabezado_pagina($as_titulo,$as_procede,$as_fecha,&$io_pdf)
+	{
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//       Function: uf_print_encabezado_pagina
+		//		    Acess: private
+		//	    Arguments: as_titulo // Título del Reporte
+		//	    		   io_pdf    // Instancia de objeto pdf
+		//    Description: Función que imprime los encabezados por página
+		//	   Creado Por: Ing. Miguel Palencia
+		// Fecha Creación: 18/05/2007.
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		$io_encabezado=$io_pdf->openObject();
+		$io_pdf->saveState();
+		$li_tm=$io_pdf->getTextWidth(11,$as_titulo);
+		$tm=306-($li_tm/2);
+		$io_pdf->rectangle(20,690,570,80);
+		//$io_pdf->addText(30,750,8,"ORGANO:");
+		//$io_pdf->addText(383,750,8,"<b>PÁGINA N°.</b>");
+		//$io_pdf->addText(510,745,8,"COD.");
+		$io_pdf->addText(165,750,11,"<b>"."DIRECCION DE PLANIFICACION Y PRESUPUESTO"."</b>"); // Direccion		
+		$io_pdf->addJpegFromFile('../../shared/imagebank/'.$_SESSION["ls_logo"],22,698,52,60); // Agregar Logo
+		//$io_pdf->addJpegFromFile('../../shared/imagebank/logo_barinas_2015.jpg',535,695,52,60); // Agregar Logo
+		$io_pdf->addText(515,695,8,"<b>Fecha </b>: ".$as_fecha); // Agregar la Fecha
+		//$io_pdf->addText(25,695,7,"FUENTE DE FINANCIAMIENTO:");
+		$io_pdf->addText(180,730,10,$as_titulo);
+		$io_pdf->rectangle(20,625,570,60);
+		$io_pdf->addText(30,660,7,"INSUBSISTENCIA");$io_pdf->rectangle(95,658,10,10);
+		$io_pdf->addText(130,660,7,"REDUCCIÓN");$io_pdf->rectangle(180,658,10,10);
+		$io_pdf->addText(220,675,7,"<b>RECURSOS ADICIONALES</b>");
+		$io_pdf->addText(223,660,7,"CRÉDITO ADICIONAL");$io_pdf->rectangle(300,658,10,10);
+		$io_pdf->addText(238,638,7,"RECTIFICACIÓN");$io_pdf->rectangle(300,635,10,10);
+		$io_pdf->addText(470,675,7,"<b>TRASPASO</b>");
+		$io_pdf->addText(450,660,7,"GASTOS CORRIENTES");$io_pdf->rectangle(540,658,10,10);
+		$io_pdf->addText(460,638,7,"GASTOS DE CAPITAL");$io_pdf->rectangle(540,635,10,10);
+		//Impresión de las X para el Marcado de Operacion.
+		
+		switch ($as_procede){
+		  case 'SPGINS':
+		    $io_pdf->addText(97.5,660.5,7,"<b>X</b>");//Insubsistencia  
+		  break;
+		  case 'SPGCRA':
+		    $io_pdf->addText(302.5,660.5,7,"<b>X</b>");//Crédito Adicional.
+		  break;
+		  case 'SPGREC':
+		  	$io_pdf->addText(302.5,637.5,7,"<b>X</b>");//Rectificacion.
+		  break;
+		  case 'SPGTRA':
+		  	$io_pdf->addText(542.5,660.5,7,"<b>X</b>");//Traspaso.
+		  break;		
+		}
+		
+		//Gastos Corrientes.
+        /*$io_pdf->addText(542.5,660.5,7,"<b>X</b>");
+		//Gastos de Capital.
+		$io_pdf->addText(542.5,637.5,7,"<b>X</b>");*/
+
+		$io_pdf->restoreState();
+		$io_pdf->closeObject();
+		$io_pdf->addObject($io_encabezado,'all');
+	}// end function uf_print_encabezado_pagina
+	//--------------------------------------------------------------------------------------------------------------------------------
+
+	//--------------------------------------------------------------------------------------------------------------------------------
+	function uf_print_detalle($la_data,&$io_pdf)
+	{
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//       Function: uf_print_detalle
+		//		    Acess: private
+		//	    Arguments: la_data // arreglo de información
+		//	   			   io_pdf // Objeto PDF
+		//    Description: función que imprime el detalle
+		//	   Creado Por: Ing.Miguel Palencia
+		// Fecha Creación: 13/09/2006
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $io_pdf->setStrokeColor(1,1,1);
+		$io_pdf->ezSetY(615);
+		$la_config=array('showHeadings'=>1, // Mostrar encabezados
+						 'fontSize' => 7, // Tamaño de Letras
+						 'titleFontSize' => 7,  // Tamaño de Letras de los títulos
+						 'showLines'=>1, // Mostrar Líneas
+						 'shaded'=>0, // Sombra entre líneas
+						 'colGap'=>1, // separacion entre tablas
+						 'width'=>580, // Ancho de la tabla
+						 'maxWidth'=>580, // Ancho Máximo de la tabla
+						 'xPos'=>305, // Orientación de la tabla
+						 'cols'=>array('sector'=>array('justification'=>'center','width'=>40), // Justificación y ancho de la 
+						 			   'programa'=>array('justification'=>'center','width'=>40),
+									   'actividad'=>array('justification'=>'center','width'=>40),
+									   'partida'=>array('justification'=>'center','width'=>25),
+									   'generica'=>array('justification'=>'center','width'=>25),
+									   'especifica'=>array('justification'=>'center','width'=>25), 
+									   'subespecifica'=>array('justification'=>'center','width'=>25),
+									   'auxiliar'=>array('justification'=>'center','width'=>25),
+									   'denominacion'=>array('justification'=>'left','width'=>250),
+									   'monto'=>array('justification'=>'right','width'=>80))); // Justificación y ancho 
+
+		$la_columnas = array('sector'=>'<b>Sector</b>',
+		                     'programa'=>'<b>Programa</b>',
+							 'actividad'=>'<b>Actividad</b>',
+							 'partida'=>'<b>PART</b>',
+							 'generica'=>'<b>GEN</b>',
+			                 'especifica'=>'<b>ESP</b>',
+							 'subespecifica'=>'<b>SUB-ESP</b>',
+							 'auxiliar'=>'<b>Aux</b>',
+							 'denominacion'=>'<b>DENOMINACIÓN</b>',
+							 'monto'=>'<b>BOLÍVARES</b>');
+		
+		$io_pdf->ezTable($la_data,$la_columnas,'',$la_config);
+	}// end function uf_print_detalle
+	//--------------------------------------------------------------------------------------------------------------------------------
+
+    //-----------------------------------------------------------------------------------------------------------------------------------
+	function uf_init_niveles()
+	{	///////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	   Function: uf_init_niveles
+		//	     Access: public
+		//	    Returns: vacio	 
+		//	Description: Este método realiza una consulta a los formatos de las cuentas
+		//               para conocer los niveles de la escalera de las cuentas contables  
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		global $io_funcion,$ia_niveles_scg;
+		
+		$ls_formato  = ""; $li_posicion=0; $li_indice=0;
+		$ls_formato  = trim($_SESSION["la_empresa"]["formpre"])."-";
+		$li_posicion = 1 ;
+		$li_indice   = 1 ;
+		$li_posicion = $io_funcion->uf_posocurrencia($ls_formato, "-" , $li_indice ) - $li_indice;
+		do
+		{
+			$ia_niveles_scg[$li_indice] = $li_posicion;
+			$li_indice   = $li_indice+1;
+			$li_posicion = $io_funcion->uf_posocurrencia($ls_formato, "-" , $li_indice ) - $li_indice;
+		} while ($li_posicion>=0);
+	}// end function uf_init_niveles
+	//-----------------------------------------------------------------------------------------------------------------------------------
+    
+	function uf_print_pie_de_pagina($as_nomusu,&$io_pdf)
+	{
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	//	   Function: uf_print_pie_de_pagina
+	//	     Access: public
+	//	    Returns: vacio	 
+	//	Description: Método que imprime el pie de pagina de Forma 0301 De Modificaciones Presupuestarias. 
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+   
+/*        $io_pdf->Rectangle(19,80,570,30);
+
+        $io_pdf->Rectangle(19,40,570,60);
+		$io_pdf->line(19,80,590,80);		
+		$io_pdf->line(95,40,95,100);		
+		$io_pdf->line(180,40,180,100);		
+		$io_pdf->line(290,40,290,100);	
+		$io_pdf->line(400,40,400,110);	
+		$io_pdf->line(480,40,480,100);*/
+		$io_pdf->Rectangle(20,47,570,85);
+		$io_pdf->line(20,122,590,122); //linea que divide firmas y sellos
+		$io_pdf->line(20,65,590,65); //linea superior de la RECEPCION
+		$io_pdf->line(20,113,590,113);	// Linea que se encuentra en el nivel inferior de ELABORADO POR:
+
+		$io_pdf->line(220,48,220,123);	// ESTAS LINEAS DIVIDEN LOS ESP. VERT. DE LAS FIRMAS QUE APRUEBAN	
+		$io_pdf->line(420,48,420,123);		
+		//$io_pdf->line(480,48,480,123);
+		//$io_pdf->line(490,48,490,123);						
+		$io_pdf->addText(210,125,6,"<b>FIRMAS Y SELLOS PARA LA AUTORIZACIÓN DE LA MODIFICACIÓN PRESUPUESTARIA</b>"); // Agregar el título
+		//$li_tm=$io_pdf->getTextWidth(13,$_SESSION["la_nomusu"]." ".$_SESSION["la_apeusu"]);
+		$li_tm=$io_pdf->getTextWidth(13,$as_nomusu);
+		$tm=154-($li_tm/2);
+		$io_pdf->addText(94,115,6,"<b>"."ELABORADO POR:"."</b>"); // Agregar el título
+		$io_pdf->addText($tm,55,6,$as_nomusu); // Agregar el título
+		// CONTABILIDAD ///
+		//$ls_jefe_contabilidad=$_SESSION["la_empresa"]["jefe_contabilidad"];
+		//$li_tm=$io_pdf->getTextWidth(13,$ls_jefe_contabilidad);
+		//$tm=238-($li_tm/2);
+
+		//$io_pdf->addText($tm,68,6,$ls_jefe_contabilidad); // Agregar el Nombre del Jefe de Contabilidad
+		//$ls_cargo_contabilidad=$_SESSION["la_empresa"]["cargo_contabilidad"];
+		//$li_tm=$io_pdf->getTextWidth(13,$ls_cargo_contabilidad);
+		//$tm=241-($li_tm/2);
+
+		//$io_pdf->addText($tm,115,6,$ls_cargo_contabilidad); // Agregar el título
+		// PRESUPUESTO ///
+		$io_pdf->addText(295,115,6,"<b>"."APROBADO POR:"."</b>"); // Agregar el título
+		$ls_jefe_presupuesto="<b>".$_SESSION["la_empresa"]["jefe_presupuesto"]."</b>";
+		$li_tm=$io_pdf->getTextWidth(13,$ls_jefe_presupuesto);
+		$tm=360-($li_tm/2);
+		$io_pdf->addText($tm,58,6,$ls_jefe_presupuesto); // Agregar el Nombre del Jefe de Contabilidad
+		$ls_cargo_presupuesto="<b>".$_SESSION["la_empresa"]["cargo_presupuesto"]."</b>";
+		$li_tm=$io_pdf->getTextWidth(13,$ls_cargo_presupuesto);
+		$tm=402-($li_tm/2);
+		$io_pdf->addText($tm,50,6,$ls_cargo_presupuesto); // Agregar el título
+
+		$io_pdf->addText(480,115,6,"<b>"."AUTORIZADO POR:"."</b>"); // Agregar el título
+		$ls_alcalde="<b>".$_SESSION["la_empresa"]["nomrep"]."</b>";
+		$li_tm=$io_pdf->getTextWidth(13,$ls_alcalde);
+		$tm=540-($li_tm/2);
+		$io_pdf->addText($tm,58,6,$ls_alcalde); // Agregar el Nombre del Jefe de Contabilidad
+		$ls_cargo_alcalde="<b>".$_SESSION["la_empresa"]["cargorep"]."</b>";
+		$li_tm=$io_pdf->getTextWidth(13,$ls_cargo_alcalde);
+		$tm=530-($li_tm/2);
+		$io_pdf->addText($tm,50,6,$ls_cargo_alcalde); // Agregar el título
+///////////////
+		//$io_pdf->addText(485,54,6,"CONTRALORIA MUNICIPAL"); // Agregar el título
+		//$io_pdf->addText(500,115,6,"REVISADO POR:"); // Agregar el título
+
+		
+/*		$io_pdf->addText(200,102,8,"<b>INSTITUCION</b>"); // Agregar el título
+		$io_pdf->addText(410,102,8,"<b>OFICINA NACIONAL DE PRESUPUESTO</b>"); // Agregar el título
+
+			
+		$io_pdf->addText(25,90,7,"ELABORADO POR:"); // Agregar el título
+		$io_pdf->addText(110,90,7,"REVISADO POR:"); // Agregar el título
+		$io_pdf->addText(200,90,7,"JEFE DE OFICINA DE"); // Agregar el título
+		$io_pdf->addText(210,83,7,"PLANIFICACION"); // Agregar el título
+		$io_pdf->addText(298,90,7,"APROBADO POR GERENTE"); // Agregar el título
+		$io_pdf->addText(300,83,7,"GENERAL O PRESIDENTE"); // Agregar el título
+		$io_pdf->addText(415,90,7,"JEFE SECTOR"); // Agregar el título
+		$io_pdf->addText(490,90,7,"DIRECTOR G. SECTORIAL"); // Agregar el título
+		*/
+	}// end function uf_print_encabezadopagina
+	//--------------------------------------------------------------------------------------------------------------------------------
+	  require_once("../../shared/ezpdf/class.ezpdf.php");
+	  require_once("../../shared/class_folder/class_fecha.php");
+	  require_once("../../shared/class_folder/class_funciones.php");
+	  require_once("../../shared/class_folder/tepuy_include.php"); 
+	  require_once("../../shared/class_folder/class_datastore.php");      
+	  require_once("../../shared/class_folder/class_sql.php");    
+	  require_once("tepuy_spg_funciones_reportes.php");
+	  require_once("tepuy_spg_reportes_class.php");
+	 
+	  $io_report      = new tepuy_spg_reportes_class();  
+	  $io_funrep      = new tepuy_spg_funciones_reportes();
+	  $io_funcion     = new class_funciones();
+	  $io_fecha       = new class_fecha();
+	  $io_conect      = new tepuy_include();
+	  $con            = $io_conect-> uf_conectar ();
+	  $io_msg         = new class_mensajes(); //Instanciando la clase mensajes 
+	  $io_sql         = new class_sql($con); //Instanciando  la clase sql
+	  $lb_valido      = true;
+	  $io_dsreport    = new class_datastore();
+	  $ls_codemp      = $_SESSION["la_empresa"]["codemp"];
+	  $ls_forpre      = $_SESSION["la_empresa"]["formpre"];
+	  $ls_procede     = $_GET["procede"];
+	  $ls_comprobante = $_GET["comprobante"];
+	  $ld_fecha       = $_GET["fecha"];
+	  $io_report->uf_init_niveles(&$ia_niveles_scg,&$li_posicion);
+	 // print_r($ia_niveles_scg);
+	  //print_r($li_posicion);
+	  
+	  if ($lb_valido==false)
+		 {
+		   print("<script language=JavaScript>");
+		   print(" alert('No hay nada que Reportar');"); 
+		   print(" close();");
+		   print("</script>");
+		 }
+	   else
+		 {
+			error_reporting(E_ALL);
+			set_time_limit(1800);
+			$io_pdf=new Cezpdf('LETTER','portrait'); // Instancia de la clase PDF
+			$io_pdf->selectFont('../../shared/ezpdf/fonts/Helvetica.afm'); // Seleccionamos el tipo de letra
+			$io_pdf->ezSetCmMargins(6.2,4,3,3); // Configuración de los margenes en centímetros
+			$ls_titulo = "<b>SOLICITUD DE MODIFICACIÓN PRESUPUESTARIA</b>";
+			uf_print_encabezado_pagina($ls_titulo,$ls_procede,$ld_fecha,$io_pdf); // Imprimimos el encabezado de la página
+			$li_total   = count($ia_niveles_scg);
+			$li_numrows = 0;
+			//$lb_ok= $io_report->uf_select_dt_comprobante($ls_codemp,$ls_procede,$ls_comprobante,$ld_fecha,&$li_numrows,$rs_dat,&$nomusu);
+			$lb_ok= $io_report->uf_select_dt_comprobante($ls_codemp,$ls_procede,$ls_comprobante,$ld_fecha,&$li_numrows,$rs_dat);
+			if ($li_numrows==0)
+			   {
+				 print("<script language=JavaScript>");
+				 print(" alert('No hay nada que Reportar');"); 
+				 print(" close();");
+				 print("</script>");
+			   }
+			else
+			  {
+				$nomusu= $io_report->uf_select_nombreusuario($ls_codemp,$ls_procede,$ls_comprobante);
+
+				 $li_pos = 0;
+				 $lb_impreso = false;
+				 $ld_totced  = 0;
+				 $ld_totrec  = 0; 
+				 $li_filas   = 0;
+				 //$ls_nomusu=$codusu;
+				 $io_report->uf_select_dt_comprobante_r($ls_codemp,$ls_procede,$ls_comprobante,$ld_fecha,$li_total,$la_data,$ia_niveles_scg,$li_posicion,$li_numrows);
+				 
+				 uf_print_detalle($la_data,&$io_pdf);
+				 uf_print_pie_de_pagina(strtoupper($nomusu),&$io_pdf);
+			   }
+			$io_pdf->ezStopPageNumbers(1,1);
+			if (isset($d) && $d)
+			{
+				$ls_pdfcode = $io_pdf->ezOutput(1);
+				$ls_pdfcode = str_replace("\n","\n<br>",htmlspecialchars($ls_pdfcode));
+				echo '<html><body>';
+				echo trim($ls_pdfcode);
+				echo '</body></html>';
+			}
+			else
+			{
+				ob_end_clean();  // resuleve el problema cuando no se muestran las imagenes
+				$io_pdf->ezStream();
+			}
+		 }
+		unset($io_pdf);
+		unset($io_report);
+		unset($io_funciones);
+		unset($io_function_report);
+		unset($io_fecha);
+?>	

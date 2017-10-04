@@ -1,0 +1,427 @@
+<?php
+session_start();
+if(!array_key_exists("la_logusr",$_SESSION))
+{
+	print "<script language=JavaScript>";
+	print "location.href='../tepuy_menu.php'";
+	print "</script>";		
+}
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<script language="javascript">
+	if(document.all)
+	{ //ie 
+		document.onkeydown = function(){ 
+		if(window.event && (window.event.keyCode == 122 || window.event.keyCode == 116 || window.event.ctrlKey))
+		{
+			window.event.keyCode = 505; 
+		}
+		if(window.event.keyCode == 505){ return false;} 
+		} 
+	}
+</script>
+<title>Sistema de Recursos Humanos</title>
+<meta http-equiv="" content="text/html; charset=iso-8859-1">
+<meta http-equiv="" content="text/html; charset=iso-8859-1">
+<meta http-equiv="imagetoolbar" content="no"> 
+<style type="text/css">
+<!--
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	background-color: #f3f3f3;
+}
+
+a:link {
+	color: #006699;
+}
+a:visited {
+	color: #006699;
+}
+a:active {
+	color: #006699;
+}
+.Estilo14 {color: #006699; font-weight: bold; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; }
+.Estilo20 {font-size: 10px}
+.Estilo21 {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; }
+.Estilo24 {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; }
+-->
+</style>
+<script type="text/javascript" language="JavaScript1.2" src="../../../public/js/librerias_comunes.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+
+
+</head>
+
+<body>
+
+<?php
+	$arr=array_keys($_SESSION);	
+	$li_count=count($arr);
+	for($i=0;$i<$li_count;$i++)
+	{
+		$col=$arr[$i];
+		if(($col!="ls_hostname")&&($col!="ls_login")&&($col!="ls_password")&&($col!="ls_database")&&($col!="ls_gestor")&&($col!="con")&&($col!="gestor")&&($col!="la_empresa")&&($col!="la_logusr")
+		&&($col!="la_ususeg")&&($col!="la_sistema")&&($col!="ls_port")&&($col!="ls_width")&&($col!="ls_height")&&($col!="ls_logo")&&($col!="la_apeusu")&&($col!="la_nomusu")&&($col!="la_cedusu"))
+		{
+			unset($_SESSION["$col"]);
+		}
+	}
+	// validación de los release necesarios poara que funcione el sistema de nómina
+	require_once("../../../../shared/class_folder/tepuy_release.php");
+    $io_release= new tepuy_release();
+	$lb_valido=true;
+	$lb_valido1=true;
+	
+	if($lb_valido1)
+	{
+		$lb_valido=$io_release->io_function_db->uf_select_column('sno_beneficiario','nexben');
+		if($lb_valido==false)
+		{
+			$io_release->io_msg->message("Debe Procesar Instala/Procesos/Mantenimiento/Release 3.91 ");
+			print "<script language=JavaScript>";
+			print "location.href='../../../../tepuy_menu.php'";
+			print "</script>";		
+		}
+	}
+	if($lb_valido1)
+	{
+		$lb_valido=$io_release->io_function_db->uf_select_column('sno_personal','enviorec');
+		if($lb_valido==false)
+		{
+			$io_release->io_msg->message("Debe Procesar Instala/Procesos/Mantenimiento/Release 1.92 ");
+			print "<script language=JavaScript>";
+			print "location.href='../../../../tepuy_menu.php'";
+			print "</script>";		
+		}
+	}
+	if($lb_valido1)
+	{
+		$lb_valido=$io_release->io_function_db->uf_select_column('sno_beneficiario','cedaut');
+		if($lb_valido==false)
+		{
+			$io_release->io_msg->message("Debe Procesar Instala/Procesos/Mantenimiento/Release 1.93 ");
+			print "<script language=JavaScript>";
+			print "location.href='../../../../tepuy_menu.php'";
+			print "</script>";		
+		}
+	}
+	
+	if($lb_valido1)
+	{
+		$lb_valido=$io_release->io_function_db->uf_select_table('srh_defcontrato');
+		if($lb_valido==false)
+		{
+			$io_release->io_msg->message("Debe Procesar Instala/Procesos/Mantenimiento/Release  4_03 ");
+			print "<script language=JavaScript>";
+			print "location.href='../../../../tepuy_menu.php'";
+			print "</script>";		
+		}
+	}
+	
+	if($lb_valido1)
+	{
+		$lb_valido=$io_release->io_function_db->uf_select_column('sno_personal','talcamper');
+		if($lb_valido==false)
+		{
+			$io_release->io_msg->message("Debe Procesar Instala/Procesos/Mantenimiento/Release 2008_4_13 ");
+			print "<script language=JavaScript>";
+			print "location.href='../../../../tepuy_menu.php'";
+			print "</script>";		
+		}
+	}
+	if($lb_valido1)
+	{
+		$lb_valido=$io_release->io_function_db->uf_select_column('sno_personal','anoservprecont');
+		if($lb_valido==false)
+		{
+			$io_release->io_msg->message("Debe Procesar Instala/Procesos/Mantenimiento/Release 2008_4_15 ");
+			print "<script language=JavaScript>";
+			print "location.href='../../../../tepuy_menu.php'";
+			print "</script>";		
+		}
+	}
+	
+	if($lb_valido1)
+	{
+		$lb_valido=$io_release->io_function_db->uf_select_column('sno_personal','anoservprefijo');
+		if($lb_valido==false)
+		{
+			$io_release->io_msg->message("Debe Procesar Instala/Procesos/Mantenimiento/Release 2008_4_16 ");
+			print "<script language=JavaScript>";
+			print "location.href='../../../../tepuy_menu.php'";
+			print "</script>";		
+		}
+	}
+	
+	if (array_key_exists("opener",$_GET))
+	{
+	  $ls_opener=$_GET["opener"];
+	}
+	else
+	{
+	  $ls_opener="";
+	}
+	
+	
+	
+	if ($ls_opener == "constancia_trab")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_d_constanciatrabajo.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	  if ($ls_opener == "rep_constancia_trab")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_constanciatrabajo.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	  if ($ls_opener == "rep_constancia_trab_sso")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_constanciatrabajosegurosocial.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	
+	if ($ls_opener == "listado_personal_1")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_listadopersonal.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	  if ($ls_opener == "listado_personal_2")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_listadopersonalcontratado.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	  if ($ls_opener == "listado_personal_3")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_unidadadministrativa.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	  if ($ls_opener == "listado_personal_4")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_listadopersonalgenerico.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	  if ($ls_opener == "listado_personal_5")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_listadocomponente.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	  if ($ls_opener == "listado_personal_6")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_fichapersonal.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	   if ($ls_opener == "listado_personal_7")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_listadocumpleano.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	   if ($ls_opener == "listado_personal_8")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_familiar.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	   if ($ls_opener == "listado_personal_9")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_vacaciones.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	   if ($ls_opener == "listado_personal_10")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_credencialespersonal.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  
+	  if ($ls_opener == "listado_personal_11")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_r_antiguedadpersonal.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	  if ($ls_opener == "cambio_estatus")
+	  {
+	      print("<script language='javascript'>");
+		  print("location.href = 'tepuywindow_blank.php?valor=srh';");
+	      print("pagina    = '../../../../sno/tepuy_snorh_p_personalcambioestatus.php?valor=srh';");
+		  print("ancho     = 900;");
+		  print("alto      = 850;");
+		  print("arriba    = (screen.height/2)-(alto/2);");
+		  print("izquierda = (screen.width/2)-(ancho/2);");
+	      print("window.open(pagina,'catalogo3','status=yes,menubar=no,toolbar=no,scrollbars=yes,width='+ancho+',height='+alto+',resizable=yes,location=no,top='+arriba+',left='+izquierda);");
+		  print("</script>");
+	  }
+	
+?>
+<table width="780" border="0" align="center" cellpadding="0" cellspacing="0" class="contorno">
+  <tr>
+    <td height="30" colspan="11" class="cd-logo"><img src="../../../public/imagenes/header.jpg" width="778" height="40"></td>
+  </tr>
+  
+  <tr>
+    <td width="432" height="20" colspan="11" bgcolor="#E7E7E7">
+		<table width="762" border="0" align="center" cellpadding="0" cellspacing="0">
+			  <td width="432" height="20" bgcolor="#E7E7E7" class="descripcion_sistema">Sistema de Recursos Humanos</td>
+			    <td width="346" bgcolor="#E7E7E7"><div align="right"><span class="letras-pequenas"><b><?PHP print date("j/n/Y")." - ".date("h:i a");?></b></span></div></td>
+				<tr>
+	  	      <td height="20" bgcolor="#E7E7E7" class="descripcion_sistema">&nbsp;</td>
+	  	      <td bgcolor="#E7E7E7" class="letras-pequenas"><div align="right"><b><?PHP print $_SESSION["la_nomusu"]." ".$_SESSION["la_apeusu"];?></b></div></td> </tr>
+	  	</table>
+	 </td>
+  </tr>
+  
+  <tr>
+    <td height="20" colspan="11" bgcolor="#E7E7E7" class="cd-menu"><script type="text/javascript" language="JavaScript1.2" src="../../js/menu/menu.js"></script></td>
+  </tr>
+  
+</table>
+<form name="form1" method="post" action="">
+</form>
+</body>
+<script language="javascript">  
+
+  function ue_nuevo()
+  {
+	
+  }
+  
+  function ue_guardar()
+  {
+	
+  }
+  
+  function ue_eliminar()
+  {
+	
+  }
+  
+  function ue_buscar()
+  {
+	
+  }
+
+  function ue_cerrar()
+  {
+	f=document.form1;
+	f.action="tepuywindow_blank.php";
+	f.submit();
+  }
+  
+  function ue_close()
+  {
+    close();
+  }
+
+</script>
+</html>

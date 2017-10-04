@@ -1,0 +1,63 @@
+.celdas-amarillasX{background-color:#FFFFCC;color:#2403FA;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:normal;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px} /* FFFFCC Amarillo claro CC0000 Rojo 2403FA Azul*/
+.celdas-amarillas{background-color:#FFFFCC;color:#666666;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:normal;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px} /* FFFFCC Amarillo claro 666666 gris*/
+.celdas-azules {background-color:#CCCCCC;color:#000000;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:normal;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px} /* CC0000 Rojo 000000 1F06FD Azul 000000 Negro*/
+.celdas-azulesX {background-color:#dae9f3;color:#000000;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:normal;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px} /* dae9f3 azul claro 000000 Negro*/
+.celdas-blancas{
+	background-color:#FFFFFF; /* FFFFFF Blanco*/
+	color:#000000;  /* 000000 Negro */
+	font-family:Tahoma, Verdana, Arial;
+	font-size:11px;
+	font-weight:normal;
+	padding: 2px;
+}
+.celdas-grisesX{background-color:#eeeeee;color:#666666;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:normal;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px} /* eeeeee Gris 666666 Gris*/
+.celdas-verdesX{background-color:#DAF3DB;color:#666666;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:normal;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px} /* DAF3DB Verde Claro 666666 Gris*/
+.celdas-grises{background-color:#eeeeee;color:#2C00CD;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:normal;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px} /* eeeeee Gris CC0000 Rojo 2C00CD Azul */
+.celdas-verdes{background-color:#DAF3DB;color:#2C00CD;font-family:Tahoma, Verdana, Arial;font-size:11px;font-weight:normal;padding-bottom:2px;padding-left:15px;padding-right:15px;padding-top:2px} /* DAF3DB Verde Claro CC0000 Rojo 2C00CD Azul */
+.fondo-tabla{border:none;background-color: #2E82CB;text-indent: 2pt;} /* CC0000 Rojo 2C00CD Azul */
+.fondo-tablaX{border:none;background-color: #CCCCCC;text-indent: 2pt;} /* CCCCCC Gris */
+.titulo-celda {
+	background-color:#2E82CB; /* CC0000 Rojo 2C00CD Azul */
+	color:#FFFFFF; /* FFFFFF Blanco */
+	font-family:Tahoma, Verdana, Arial;
+	font-size:11px;
+	font-weight:bold;
+	text-align: center;
+	border: thin none #CCCCCC; /* CCCCCC Gris */
+}
+.titulo-celdanew {
+	background-color:#FFFFFF; /* FFFFFF Blanco */
+	color:#2C00CD; /* CC0000 Rojo 2C00CD Azul */
+	font-family:Tahoma, Verdana, Arial;
+	font-size:11px;
+	font-weight:bold;
+	text-align: center;
+	border: thin none #CCCCCC; /* CCCCCC Gris */
+}
+.titulo-celdaX {
+	background-color:#00FB88; /* 00FB88 Verde */
+	color:#FFFFFF; /* FFFFFF Blanco */
+	font-family:Tahoma, Verdana, Arial;
+	font-size:11px;
+	font-weight:bold;
+	text-align: center;
+	border: thin none #CCCCCC; /* CCCCCC Gris */
+}.titulo-celdanewX {
+	background-color:#3982C6; /* 3982C6 Azul */
+	color:#FFFFFF; /* FFFFFF Blanco */
+	font-family:Tahoma, Verdana, Arial;
+	font-size:11px;
+	font-weight:bold;
+	text-align: center;
+	border: thin none #CCCCCC; /* CCCCCC Gris */
+}
+.bordeazul{
+	background-color:#2C00CD; /* CC0000 Rojo 2C00CD Azul */
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size:11px;
+}
+.bordeazulX{
+	background-color:#dae9f3; /* dae9f3 Azul Claro */
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size:11px;
+}

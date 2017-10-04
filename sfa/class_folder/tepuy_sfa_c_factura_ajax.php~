@@ -1,0 +1,361 @@
+<?php
+	session_start();
+	//ini_set('display_errors', 1);
+	require_once("../../shared/class_folder/grid_param.php");
+	$io_grid=new grid_param();
+	require_once("class_funciones_sfa.php");
+	$io_funciones_sfa=new class_funciones_sfa();
+	// tipo de la orden de compra si es de BIENES ó de SERVICIOS
+	$ls_tipo=$io_funciones_sfa->uf_obtenervalor("tipo","");
+	// tipo de la solicitud si es orden de compra  o es una sep
+	$ls_tipsol=$io_funciones_sfa->uf_obtenervalor("tipsol","");
+	// proceso a ejecutar
+	$ls_proceso=$io_funciones_sfa->uf_obtenervalor("proceso","");
+	// total de filas de Bienes
+	$li_totalbienes=$io_funciones_sfa->uf_obtenervalor("totalbienes","1");
+	// total de filas de Servicios
+	$li_totalservicios=$io_funciones_sfa->uf_obtenervalor("totalservicios","1");
+	// total de filas de Cargos
+	$li_totalcargos=$io_funciones_sfa->uf_obtenervalor("totalcargos","1");
+	// total de filas de Cuentas
+	$li_totalcuentas=$io_funciones_sfa->uf_obtenervalor("totalcuentas","1");
+	// total de filas de Cuentas cargos
+	$li_totalcuentascargo=$io_funciones_sfa->uf_obtenervalor("totalcuentascargo","1");
+	// Indica si se deben cargar los cargos de un bien ó servicios ó si solo se deben pintar
+	$ls_cargarcargos=$io_funciones_sfa->uf_obtenervalor("cargarcargos","1");
+	// Valor del Subtotal de la orden de compra
+	$li_subtotal=$io_funciones_sfa->uf_obtenervalor("subtotal","0,00");
+	// Valor del Cargo de la orden de compra
+	$li_cargos=$io_funciones_sfa->uf_obtenervalor("cargos","0,00");
+	// Valor del Total de la orden de compra
+	$li_total=$io_funciones_sfa->uf_obtenervalor("total","0,00");
+	// Número de orden de compra si se va a cargar
+	$ls_numsol=$io_funciones_sfa->uf_obtenervalor("numsol","");
+	// Número de orden de compra si se va a cargar
+	$ls_numfactura=$io_funciones_sfa->uf_obtenervalor("numfactura","");
+	// tipo de contribuyente del proveedor de la orden de compra 
+	$ls_tipconpro = $io_funciones_sfa->uf_obtenervalor("tipconpro","");
+	$ls_codivasel = $io_funciones_sfa->uf_obtenervalor("codivasel","");
+	//print "codivasel: ".$ls_codivasel; // Muestra el iva seleccionado
+	//print "proceso: ".$ls_proceso;
+	$ls_tipafeiva = $_SESSION["la_empresa"]["confiva"];//Tipo de la Afectación del IVA, P=Presupuesto y C=Contabilidad.
+	$ls_titulo="";
+	$la_cuentacargo[0]="";
+	$li_cuenta=1;
+	switch($ls_proceso)
+	{
+	
+		case "LIMPIAR":
+				$ls_titulo="PRODUCTOS";
+				uf_print_productos($li_totalbienes,$ls_tipconpro);
+
+			/*	uf_print_creditos($ls_titulo,$li_totalcargos,$ls_cargarcargos,"B",$ls_tipconpro);
+				uf_print_cuentas_gasto($li_totalcuentas,"B");
+				if ($ls_tipafeiva=='P')
+				{
+				     uf_print_cuentas_cargo($li_totalcuentascargo,$ls_cargarcargos,"B",$ls_tipconpro);
+				}*/
+				uf_print_total($li_subtotal,$li_cargos,$li_total);
+		break;
+			
+		case "LOADFACTURA":
+			$ls_titulo="Productos";
+			uf_load_productos($ls_numfactura);
+			/*uf_load_creditos($ls_titulo,$ls_numordcom,"B");
+			uf_load_cuentas($ls_numordcom,"B",$ls_tipsol);
+			if ($ls_tipafeiva=='P')
+			   {
+			     uf_load_cuentas_cargo($ls_numordcom,"B",$ls_tipsol);
+			   }*/
+			uf_print_total($li_subtotal,$li_cargos,$li_total);
+		break;
+				
+		case "AGREGARPRODUCTO":
+			//require_once("tepuy_sfa_c_registro_factura.php");
+			//$io_registro_factura=new tepuy_sfa_c_registro_factura("../../");
+			//$ls_poriva=0;
+			/*if(!empty($ls_codivasel))
+			{
+				$ls_poriva=$io_registro_factura->uf_sfa_buscar_poriva($ls_codivasel);
+				//print "% Iva: ".$ls_poriva;
+			}*/
+			$ls_titulo="Productos";
+			uf_print_productos($li_totalbienes,$ls_tipconpro);
+			////////uf_print_creditos($ls_titulo,$li_totalcargos,$ls_cargarcargos,"B",$ls_tipconpro);
+			//uf_print_creditos_iva($ls_titulo,$li_totalcargos,$ls_cargarcargos,"B",$ls_tipconpro,$ls_codivasel);
+			//uf_print_cuentas_gasto($li_totalcuentas,"B");
+			if ($ls_tipafeiva=='P')
+			   {
+			  //   uf_print_cuentas_cargo($li_totalcuentascargo,$ls_cargarcargos,"B",$ls_tipconpro);
+			   } 
+			uf_print_total($li_subtotal,$li_cargos,$li_total);
+		break;
+		
+	}
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	function uf_print_productos($ai_totalbienes,$as_tipconpro)
+	{	
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	     Function: uf_print_bienes
+		//		   Access: private
+		//	    Arguments: ai_totalbienes  // Total de filas a imprimir
+		//	  Description: Método que imprime el grid de los Bienes
+		//	   Creado Por: Ing. Miguel Palencia/ Ing. Juniors Fraga
+		// Modificado Por: Ing. Miguel Palencia
+		// Fecha Creación: 17/03/2007								Fecha Última Modificación : 12/05/2007
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		global $io_grid, $io_funciones_sfa;
+		
+		// Titulos del Grid de Bienes
+		$lo_title[1]="C&oacute;digo";
+		$lo_title[2]="Denominaci&oacute;n";
+		$lo_title[3]="Cantidad";
+		$lo_title[4]="Unidad de Medida";
+		//$lo_title[5]="Unidad";
+		$lo_title[5]="Precio/Unid.";
+		$lo_title[6]="Sub-Total";
+		$lo_title[7]="% I.V.A.";
+		$lo_title[8]="Impuesto"; 
+		$lo_title[9]="Total";
+		$lo_title[10]="";
+		//print "totalbienes: ".$ai_totalbienes;
+		// Recorrido de todos los Bienes del Grid
+		$as_poriva = trim($io_funciones_sfa->uf_obtenervalor("codivasel",""));
+		$agregar = trim($io_funciones_sfa->uf_obtenervalor("agregar",""));
+		//print "Agregar: ".$agregar;
+		//print "IVA Seleccionado: ".$as_poriva;
+		//print "codivasel: ".$as_poriva;//." % IVA: ".$as_poriva;
+		$laqueviene=$ai_totalbienes-1;
+		for($li_fila=1;$li_fila<=$ai_totalbienes;$li_fila++)
+		{
+			//print "Fila: ".$li_fila." Viene: ".$laqueviene;
+			$ls_codart		 = trim($io_funciones_sfa->uf_obtenervalor("txtcodart".$li_fila,""));
+			
+			$ls_denart		 = $io_funciones_sfa->uf_obtenervalor("txtdenart".$li_fila,"");
+			$li_canart		 = $io_funciones_sfa->uf_obtenervalor("txtcanart".$li_fila,"0,00");
+			$ls_denunimed	 	 = strtoupper($io_funciones_sfa->uf_obtenervalor("txtdenunimed".$li_fila,""));
+			//$ls_unidad		 = $io_funciones_sfa->uf_obtenervalor("cmbunidad".$li_fila,"M");
+			$as_poriva		 = $io_funciones_sfa->uf_obtenervalor("txtporiva".$li_fila,"0.00");
+			$li_preart		 = $io_funciones_sfa->uf_obtenervalor("txtpreart".$li_fila,"0,00");
+			$li_subtotart	 	 = $io_funciones_sfa->uf_obtenervalor("txtsubtotart".$li_fila,"0,00");
+            		$li_carart		 = $io_funciones_sfa->uf_obtenervalor("txtcarart".$li_fila,"0,00");
+			$li_totart		 = $io_funciones_sfa->uf_obtenervalor("txttotart".$li_fila,"0,00");
+			$ls_spgcuenta	 = trim($io_funciones_sfa->uf_obtenervalor("txtspgcuenta".$li_fila,""));
+			$li_unidad		 = $io_funciones_sfa->uf_obtenervalor("txtunidad".$li_fila,"");
+			$ls_numsolord	 = trim($io_funciones_sfa->uf_obtenervalor("txtnumsolord".$li_fila,""));
+			$ls_coduniadmsep = trim($io_funciones_sfa->uf_obtenervalor("txtcoduniadmsep".$li_fila,""));
+			$ls_denuniadmsep = trim($io_funciones_sfa->uf_obtenervalor("txtdenuniadmsep".$li_fila,""));
+			$ls_estpreunieje = $io_funciones_sfa->uf_obtenervalor("txtestpreunieje".$li_fila,"");
+			if($agregar==1)
+			{
+				if($li_fila==$laqueviene)
+				{
+					$as_poriva = trim($io_funciones_sfa->uf_obtenervalor("codivasel",""));
+					//print "Fila: ".$li_fila." La que viene: ".$laqueviene." IVA aplicar: ".$as_poriva;
+				}
+			}
+			if($ls_unidad=="M") // Si es al Mayor
+			{
+				$ls_maysel="selected";
+				$ls_detsel="";
+			}
+			else // Si es al Detal
+			{
+				$ls_maysel="";
+				$ls_detsel="selected";
+			}
+			$lo_object[$li_fila][1]="<input type=text name=txtcodart".$li_fila."       id=txtcodart".$li_fila."    class=sin-borde style=text-align:center size=22 value='".$ls_codart."'    readonly><input type=hidden name=txtnumsolord".$li_fila." id=txtnumsolord".$li_fila." value='".$ls_numsolord."'><input type=hidden name=txtcoduniadmsep".$li_fila." id=txtcoduniadmsep".$li_fila." value='".$ls_coduniadmsep."'>";
+			$lo_object[$li_fila][2]="<input type=text name=txtdenart".$li_fila."       id=txtdenart".$li_fila."    class=sin-borde style=text-align:left   size=20 value='".$ls_denart."'    readonly><input type=hidden name=txtdenuniadmsep".$li_fila." id=txtdenuniadmsep".$li_fila." value='".$ls_denuniadmsep."'><input type=hidden name=txtestpreunieje".$li_fila." id=txtestpreunieje".$li_fila." value='".$ls_estpreunieje."'>";
+			$lo_object[$li_fila][3]="<input type=text name=txtcanart".$li_fila."       id=txtcanart".$li_fila."    class=sin-borde style=text-align:right  size=8  value='".$li_canart."'    onKeyPress=return(ue_formatonumero(this,'.',',',event)); onBlur=ue_procesar_monto('B','".$li_fila."',');> "; 
+			$lo_object[$li_fila][4]="<input type=text name=txtdenunimed".$li_fila."    id=txtdenunimed".$li_fila." class=sin-borde style=text-align:center size=10 value='".$ls_denunimed."' title='".$ls_denunimed."'readonly>";
+	//		$lo_object[$li_fila][5]="<select name=cmbunidad".$li_fila." style='width:60px' onChange=ue_procesar_monto('B','".$li_fila."');><option value=D ".$ls_detsel.">Detal</option><option value=M ".$ls_maysel.">Mayor</option></select>";
+			$lo_object[$li_fila][5]="<input type=text name=txtpreart".$li_fila."       id=txtpreart".$li_fila."    class=sin-borde style=text-align:right  size=10 value='".$li_preart."' 	 onKeyPress=return(ue_formatonumero(this,'.',',',event)); onBlur=ue_procesar_monto('B','".$li_fila."');>";
+			$lo_object[$li_fila][6]="<input type=text name=txtsubtotart".$li_fila."    id=txtsubtotart".$li_fila." class=sin-borde style=text-align:right  size=14 value='".$li_subtotart."'onBlur=ue_procesar_monto('B','".$li_fila."') readonly>";
+			$lo_object[$li_fila][7]="<input type=text name=txtporiva".$li_fila."       id=txtporiva".$li_fila."    class=sin-borde style=text-align:right  size=10 value='".$as_poriva."'    readonly>";
+			$lo_object[$li_fila][8]="<input type=text name=txtcarart".$li_fila."       id=txtcarart".$li_fila."    class=sin-borde style=text-align:right  size=10 value='".$li_carart."'  onBlur=ue_procesar_monto('B','".$li_fila."'  readonly>";
+			$lo_object[$li_fila][9]="<input type=text name=txttotart".$li_fila."       id=txttotart".$li_fila."    class=sin-borde style=text-align:right  size=14 value='".$li_totart."' onBlur=ue_procesar_monto('B','".$li_fila."'    readonly>".
+									"<input type=hidden name=txtspgcuenta".$li_fila." id=txtspgcuenta".$li_fila." value='".$ls_spgcuenta."'> ".
+									"<input type=hidden name=txtunidad".$li_fila."    id=txtunidad".$li_fila."    value='".$li_unidad."'>";
+	
+			if($li_fila==$ai_totalbienes)// si es la última fila no pinto el eliminar
+			{
+				$lo_object[$li_fila][10]="";
+			}
+			else
+			{
+				$lo_object[$li_fila][10]="<a href=javascript:ue_delete_bienes('".$li_fila."');><img src=../shared/imagebank/tools15/eliminar.png title=Eliminar width=15 height=10 border=0></a>";
+			}
+		}
+		print "<p>&nbsp;</p>";
+		print "  <table width='895' border='0' align='center' cellpadding='0' cellspacing='0'";
+		print "    <tr>";
+		print " 	  <td height='22' align='left'><a href='javascript:ue_catalogo_bienes();'><img src='../shared/imagebank/tools/nuevo.png' title='Agregar Productos' width='20' height='20' border='0'>Agregar Productos</a></td>";
+		print "    </tr>";
+		print "  </table>";
+		$io_grid->makegrid($ai_totalbienes,$lo_title,$lo_object,895," PRODUCTOS ","gridbienes");
+	}// end function uf_print_bienes
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	
+	//-----------------------------------------------------------------------------------------------------------------------------------
+
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	function uf_print_total($ai_subtotal,$ai_cargos,$ai_total)
+	{	
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	     Function: uf_print_total
+		//		   Access: private
+		//	    Arguments: ai_subtotal ---> valor del subtotal
+		//				   ai_cargos ---> valor total de los cargos
+		//				   ai_total ---> total de la solicitu de pago
+		//	  Description: Método que imprime los totales de la una orden de compra
+		//	   Creado Por: Ing. Miguel Palencia/ Ing. Juniors Fraga
+		// Modificado Por: Ing. Miguel Palencia
+		// Fecha Creación: 17/03/2007								Fecha Última Modificación : 12/05/2007
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		print "<table width='840' height='116' border='0' align='center' cellpadding='0' cellspacing='0' class='formato-blanco'>";
+		print "        <tr class='titulo-celdanew'>";
+		print "          <td height='22' colspan='4'><div align='center'>Totales</div></td>";
+		print "        </tr>";
+		print "        <tr>";
+		print "          <td width='128' height='13'>&nbsp;</td>";
+		print "          <td width='113' height='13' align='left'></td>";
+		print "          <td width='368' height='13' align='right'><div align='right'></div></td>";
+		print "          <td width='239' height='13' align='left'>&nbsp;</td>";
+		print "        </tr>";
+		print "        <tr>";
+		print "          <td height='22'>&nbsp;</td>";
+		print "          <td height='22' align='left'></td>";
+		print "          <td height='22' align='right'><strong>Subtotal&nbsp;&nbsp;</strong></td>";
+		print "          <td height='22'><input name='txtsubtotal'  type='text' class='titulo-conect' id='txtsubtotal' style='text-align:right' value='".$ai_subtotal."' size='30' maxlength='25' readonly align='right'></td>";
+		print "        </tr>";
+		print "        <tr>";
+		print "          <td height='22'>&nbsp;</td>";
+		print "          <td height='22' align='left'></td>";
+		print "          <td height='22' align='right'><div align='right'><strong>Otros Cr&eacute;ditos&nbsp;&nbsp;</strong></div></td>";
+		print "          <td height='22'><input name='txtcargos' type='text' class='titulo-conect' id='txtcargos' style='text-align:right' value='".$ai_cargos."' size='30' maxlength='25' readonly align='right'></td>";
+		print "        </tr>";
+		print "        <tr>";
+		print "          <td height='22'>&nbsp;</td>";
+		print "          <td height='22'>&nbsp;</td>";
+		print "          <td height='22' align='right'><div align='right'><strong>Total General&nbsp;&nbsp;</strong></div></td>";
+		print "          <td height='22'><input name='txttotal' type='text' class='titulo-conect' id='txttotal' style='text-align:right' value='".$ai_total."' size='30' maxlength='25' readonly align='right'></td>";
+		print "        </tr>";
+		print "        <tr>";
+		print "          <td height='13' colspan='4'>&nbsp;</td>";
+		print "			</tr>";
+		print "</table>";
+	}// end function uf_print_total
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	
+
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	function uf_load_productos($as_numfactura)
+	{	
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//	     Function: uf_load_bienes
+		//		   Access: private
+		//	    Arguments: as_numordcom  // numero de la ordem de compra 
+		//                 $as_tipsol  ---> tipo de la solicitud sep o sfa
+		//	  Description: Método que busca los bienes de la orden de compra  y los imprime
+		//	   Creado Por: Ing. Miguel Palencia/ Ing. Juniors Fraga
+		// Modificado Por: Ing. Miguel Palencia
+		// Fecha Creación: 17/03/2007								Fecha Última Modificación : 12/05/2007
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		global $io_grid, $io_funciones_sfa;
+		
+		// Titulos del Grid de Bienes
+		$lo_title[1]="C&oacute;digo";
+		$lo_title[2]="Denominaci&oacute;n";
+		$lo_title[3]="Cantidad";
+		$lo_title[4]="Unidad de Medida";
+		$lo_title[5]="Unidad";
+		$lo_title[6]="Precio/Unid.";
+		$lo_title[7]="Sub-Total";
+		$lo_title[8]="Cargos"; 
+		$lo_title[9]="Total";
+		$lo_title[10]="";
+		require_once("tepuy_sfa_c_registro_orden_compra.php");
+		$io_registro_orden=new tepuy_sfa_c_registro_orden_compra("../../");
+		$rs_data = $io_registro_orden->uf_load_bienes($as_numordcom,$as_tipsol);
+		$li_fila=0;
+		$ls_maysel="selected";
+		$ls_detsel="";
+		while($row=$io_registro_orden->io_sql->fetch_row($rs_data))	  
+		{ 
+			$li_fila++;
+			$ls_codart		 = trim($row["codart"]);
+			$ls_denart		 = utf8_encode($row["denart"]);
+			$ls_denunimed    = strtoupper($row["denunimed"]);
+			$ls_unidad		 = $row["unidad"];
+			$li_canart		 = $row["canart"];
+		    $li_preart		 = $row["preuniart"];
+		    $li_totart		 = $row["montotart"];
+			$ls_spgcuenta	 = trim($row["spg_cuenta"]);
+			$li_unimed		 = $row["unimed"];
+			$ls_numsolord	 = $row["numsol"];
+			//$ls_coduniadmsep = $row["coduniadm"]; 
+			//$ls_denuniadmsep = $row["denuniadm"];
+			$ls_estpreunieje = $row["estpreunieje"];
+			$rs_data1 = $io_registro_orden->uf_buscar_coduniadmsep();
+			while($row=$io_registro_orden->io_sql->fetch_row($rs_data1))	  
+		    { 
+			   $ls_coduniadmsep = $row["coduniadm"]; 
+			   $ls_denuniadmsep = $row["denuniadm"];
+			}
+			if($ls_unidad=="M") // Si es al Mayor
+			{
+				$ls_maysel="selected";
+				$ls_detsel="";
+				$li_subtotart=$li_preart*($li_canart*$li_unimed);
+			}
+			else // Si es al Detal
+			{
+				$ls_maysel="";
+				$ls_detsel="selected";
+				$li_subtotart=$li_preart*$li_canart;
+			}
+			$li_carart=$li_totart-$li_subtotart;
+			$li_subtotart=number_format($li_subtotart,2,",",".");
+			$li_totart=number_format($li_totart,2,",",".");
+			$li_canart=number_format($li_canart,2,",",".");
+			$li_preart=number_format($li_preart,2,",",".");
+			$li_carart=number_format($li_carart,2,",",".");
+			$lo_object[$li_fila][1]="<input type=text name=txtcodart".$li_fila."    id=txtcodart".$li_fila."    class=sin-borde style=text-align:center size=22 value='".$ls_codart."'    readonly><input type=hidden name=txtnumsolord".$li_fila." id=txtnumsolord".$li_fila."  value='".$ls_numsolord."'><input type=hidden name=txtcoduniadmsep".$li_fila." id=txtcoduniadmsep".$li_fila."  value='".$ls_coduniadmsep."'>";
+			$lo_object[$li_fila][2]="<input type=text name=txtdenart".$li_fila."    id=txtdenart".$li_fila."    class=sin-borde style=text-align:left   size=20 value='".$ls_denart."'    readonly><input type=hidden name=txtdenuniadmsep".$li_fila." id=txtdenuniadmsep".$li_fila."  value='".$ls_denuniadmsep."'><input type=hidden name=txtestpreunieje".$li_fila." id=txtestpreunieje".$li_fila." value='".$ls_estpreunieje."'>";
+			$lo_object[$li_fila][3]="<input type=text name=txtcanart".$li_fila."    id=txtcanart".$li_fila."    class=sin-borde style=text-align:right  size=8  value='".$li_canart."'    onKeyPress=return(ue_formatonumero(this,'.',',',event)); onBlur=ue_procesar_monto('B','".$li_fila."');>"; 
+			$lo_object[$li_fila][4]="<input type=text name=txtdenunimed".$li_fila." id=txtdenunimed".$li_fila." class=sin-borde style=text-align:center size=10 value='".$ls_denunimed."' readonly>";
+			$lo_object[$li_fila][5]="<select name=cmbunidad".$li_fila." style='width:60px' onChange=ue_procesar_monto('B','".$li_fila."');><option value=D ".$ls_detsel.">Detal</option><option value=M ".$ls_maysel.">Mayor</option></select>";
+			$lo_object[$li_fila][6]="<input type=text name=txtpreart".$li_fila."    id=txtpreart".$li_fila."    class=sin-borde style=text-align:right  size=10 value='".$li_preart."' 	  onKeyPress=return(ue_formatonumero(this,'.',',',event)); onBlur=ue_procesar_monto('B','".$li_fila."');>";
+			$lo_object[$li_fila][7]="<input type=text name=txtsubtotart".$li_fila." id=txtsubtotart".$li_fila." class=sin-borde style=text-align:right  size=14 value='".$li_subtotart."' readonly>";
+			$lo_object[$li_fila][8]="<input type=text name=txtcarart".$li_fila."    id=txtcarart".$li_fila."    class=sin-borde style=text-align:right  size=10 value='".$li_carart."'    readonly>";
+			$lo_object[$li_fila][9]="<input type=text name=txttotart".$li_fila."    id=txttotart".$li_fila."    class=sin-borde style=text-align:right  size=14 value='".$li_totart."'    readonly>".
+									"<input type=hidden name=txtspgcuenta".$li_fila." id=txtspgcuenta".$li_fila."  value='".$ls_spgcuenta."'> ".
+									"<input type=hidden name=txtunidad".$li_fila."    id=txtunidad".$li_fila."     value='".$li_unimed."'>";
+			$lo_object[$li_fila][10]="<a href=javascript:ue_delete_bienes('".$li_fila."');><img src=../shared/imagebank/tools15/eliminar.png title=Eliminar width=15 height=10 border=0></a>";
+		}
+		$li_fila++;
+		$lo_object[$li_fila][1]="<input type=text name=txtcodart".$li_fila."    id=txtcodart".$li_fila."    class=sin-borde style=text-align:center size=22 value=''  readonly><input type=hidden name=txtnumsolord".$li_fila." id=txtnumsolord".$li_fila."  value=''><input type=hidden name=txtcoduniadmsep".$li_fila." id=txtcoduniadmsep".$li_fila."  value=''>";
+		$lo_object[$li_fila][2]="<input type=text name=txtdenart".$li_fila."    id=txtdenart".$li_fila."    class=sin-borde style=text-align:left   size=20 value=''  readonly><input type=hidden name=txtdenuniadmsep".$li_fila." id=txtdenuniadmsep".$li_fila."  value=''><input type=hidden name=txtestpreunieje".$li_fila." id=txtestpreunieje".$li_fila." value=''>";
+		$lo_object[$li_fila][3]="<input type=text name=txtcanart".$li_fila."    id=txtcanart".$li_fila."    class=sin-borde style=text-align:right  size=8  value=''   onKeyPress=return(ue_formatonumero(this,'.',',',event)); onBlur=ue_procesar_monto('B','".$li_fila."');>"; 
+		$lo_object[$li_fila][4]="<input type=text name=txtdenunimed".$li_fila." id=txtdenunimed".$li_fila." class=sin-borde style=text-align:center size=10 value='' readonly>";
+		$lo_object[$li_fila][5]="<select name=cmbunidad".$li_fila." style='width:60px' onChange=ue_procesar_monto('B','".$li_fila."');><option value=D ".$ls_detsel.">Detal</option><option value=M ".$ls_maysel.">Mayor</option></select>";
+		$lo_object[$li_fila][6]="<input type=text name=txtpreart".$li_fila."    id=txtpreart".$li_fila."    class=sin-borde style=text-align:right  size=10 value=''  onKeyPress=return(ue_formatonumero(this,'.',',',event)); onBlur=ue_procesar_monto('B','".$li_fila."');>";
+		$lo_object[$li_fila][7]="<input type=text name=txtsubtotart".$li_fila." id=txtsubtotart".$li_fila." class=sin-borde style=text-align:right  size=14 value=''  readonly>";
+		$lo_object[$li_fila][8]="<input type=text name=txtcarart".$li_fila."    id=txtcarart".$li_fila."    class=sin-borde style=text-align:right  size=10 value=''  readonly>";
+		$lo_object[$li_fila][9]="<input type=text name=txttotart".$li_fila."    id=txttotart".$li_fila."    class=sin-borde style=text-align:right  size=14 value=''  readonly>".
+								" <input type=hidden name=txtspgcuenta".$li_fila." id=txtspgcuenta".$li_fila." value=''>".
+								" <input type=hidden name=txtunidad".$li_fila."    id=txtunidad".$li_fila."    value=''>";
+		$lo_object[$li_fila][10]="";
+		print "<p>&nbsp;</p>";
+		print "  <table width='895' border='0' align='center' cellpadding='0' cellspacing='0'";
+		print "    <tr>";
+		print " 	  <td height='22' align='left'><a href='javascript:ue_catalogo_bienes();'><img src='../shared/imagebank/tools/nuevo.png' title='Agregar Productos' width='20' height='20' border='0'>Agregar Detalle Bienes</a></td>";
+		print "    </tr>";
+		print "  </table>";
+		unset($io_registro_orden);
+		$io_grid->makegrid($li_fila,$lo_title,$lo_object,895,"Detalle de Bienes","gridbienes");
+	}// end function uf_load_bienes
+	//-----------------------------------------------------------------------------------------------------------------------------------
+	
+	//-----------------------------------------------------------------------------------------------------------------------------------
+?>

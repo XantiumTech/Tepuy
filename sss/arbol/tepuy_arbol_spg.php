@@ -1,0 +1,595 @@
+<?php
+$gi_total=74;
+$arbol["sistema"][1]="SPG";
+$arbol["nivel"][1]=0;
+$arbol["nombre_logico"][1]="Procesos";
+$arbol["nombre_fisico"][1]="";
+$arbol["id"][1]="001";
+$arbol["padre"][1]="000";
+$arbol["numero_hijos"][1]=4;
+
+$arbol["sistema"][2]="SPG";
+$arbol["nivel"][2]=1;
+$arbol["nombre_logico"][2]="Formulación Presupuestaria";
+$arbol["nombre_fisico"][2]="tepuy_spg_p_apertura.php";
+$arbol["id"][2]="002";
+$arbol["padre"][2]="001";
+$arbol["numero_hijos"][2]=0;
+
+$arbol["sistema"][3]="SPG";
+$arbol["nivel"][3]=1;
+$arbol["nombre_logico"][3]="Ejecución Financiera";
+$arbol["nombre_fisico"][3]="tepuy_spg_p_comprobante.php";
+$arbol["id"][3]="003";
+$arbol["padre"][3]="001";
+$arbol["numero_hijos"][3]=0;
+
+$arbol["sistema"][4]="SPG";
+$arbol["nivel"][4]=1;
+$arbol["nombre_logico"][4]="Modificaciones Presupuestarias";
+$arbol["nombre_fisico"][4]="";
+$arbol["id"][4]="004";
+$arbol["padre"][4]="001";
+$arbol["numero_hijos"][4]=4;
+
+$arbol["sistema"][5]="SPG";
+$arbol["nivel"][5]=2;
+$arbol["nombre_logico"][5]="Traspasos";
+$arbol["nombre_fisico"][5]="tepuy_spg_p_traspaso.php";
+$arbol["id"][5]="005";
+$arbol["padre"][5]="004";
+$arbol["numero_hijos"][5]=0;
+
+$arbol["sistema"][6]="SPG";
+$arbol["nivel"][6]=2;
+$arbol["nombre_logico"][6]="Credito/Ingreso Adicional";
+$arbol["nombre_fisico"][6]="tepuy_spg_p_adicional.php";
+$arbol["id"][6]="006";
+$arbol["padre"][6]="004";
+$arbol["numero_hijos"][6]=0;
+
+$arbol["sistema"][7]="SPG";
+$arbol["nivel"][7]=2;
+$arbol["nombre_logico"][7]="Rectificaciones";
+$arbol["nombre_fisico"][7]="tepuy_spg_p_rectificaciones.php";
+$arbol["id"][7]="007";
+$arbol["padre"][7]="004";
+$arbol["numero_hijos"][7]=0;
+
+$arbol["sistema"][8]="SPG";
+$arbol["nivel"][8]=2;
+$arbol["nombre_logico"][8]="Insubsistencias";
+$arbol["nombre_fisico"][8]="tepuy_spg_p_insubsistencias.php";
+$arbol["id"][8]="008";
+$arbol["padre"][8]="004";
+$arbol["numero_hijos"][8]=0;
+
+$arbol["sistema"][9]="SPG";
+$arbol["nivel"][9]=1;
+$arbol["nombre_logico"][9]="Programación de Reportes";
+$arbol["nombre_fisico"][9]="tepuy_spg_p_progrep.php";
+$arbol["id"][9]="009";
+$arbol["padre"][9]="001";
+$arbol["numero_hijos"][9]=0;
+
+$arbol["sistema"][10]="SPG";
+$arbol["nivel"][10]=1;
+$arbol["nombre_logico"][10]="Contabilizar Modificaciones Presupuestarias";
+$arbol["nombre_fisico"][10]="";
+$arbol["id"][10]="010";
+$arbol["padre"][10]="001";
+$arbol["numero_hijos"][10]=2;
+
+$arbol["sistema"][11]="SPG";
+$arbol["nivel"][11]=2;
+$arbol["nombre_logico"][11]="Aprobación";
+$arbol["nombre_fisico"][11]="tepuy_mis_p_contabiliza_mp.php";
+$arbol["id"][11]="011";
+$arbol["padre"][11]="010";
+$arbol["numero_hijos"][11]=0;
+
+$arbol["sistema"][12]="SPG";
+$arbol["nivel"][12]=2;
+$arbol["nombre_logico"][12]="Reverso de Aprobación";
+$arbol["nombre_fisico"][12]="tepuy_mis_p_reversa_mp.php";
+$arbol["id"][12]="012";
+$arbol["padre"][12]="010";
+$arbol["numero_hijos"][12]=0;
+
+$arbol["sistema"][13]="SPG";
+$arbol["nivel"][13]=0;
+$arbol["nombre_logico"][13]="Reportes";
+$arbol["nombre_fisico"][13]="";
+$arbol["id"][13]="013";
+$arbol["padre"][13]="000";
+$arbol["numero_hijos"][13]=6;
+
+$arbol["sistema"][14]="SPG";
+$arbol["nivel"][14]=1;
+$arbol["nombre_logico"][14]="Estándar";
+$arbol["nombre_fisico"][14]="";
+$arbol["id"][14]="014";
+$arbol["padre"][14]="013";
+$arbol["numero_hijos"][14]=9;
+
+$arbol["sistema"][15]="SPG";
+$arbol["nivel"][15]=2;
+$arbol["nombre_logico"][15]="Acumulado por Cuentas";
+$arbol["nombre_fisico"][15]="tepuy_spg_r_acum_x_cuentas.php";
+$arbol["id"][15]="015";
+$arbol["padre"][15]="014";
+$arbol["numero_hijos"][15]=0;
+
+$arbol["sistema"][16]="SPG";
+$arbol["nivel"][16]=2;
+$arbol["nombre_logico"][16]="Mayor Analitico";
+$arbol["nombre_fisico"][16]="tepuy_spg_r_mayor_analitico.php";
+$arbol["id"][16]="016";
+$arbol["padre"][16]="014";
+$arbol["numero_hijos"][16]=0;
+
+$arbol["sistema"][17]="SPG";
+$arbol["nivel"][17]=2;
+$arbol["nombre_logico"][17]="Listado de Apertura";
+$arbol["nombre_fisico"][17]="tepuy_spg_r_listado_apertura.php";
+$arbol["id"][17]="017";
+$arbol["padre"][17]="014";
+$arbol["numero_hijos"][17]=0;
+
+$arbol["sistema"][18]="SPG";
+$arbol["nivel"][18]=2;
+$arbol["nombre_logico"][18]="Modificaciones Presupuestarias Aprobadas";
+$arbol["nombre_fisico"][18]="tepuy_spg_r_modificaciones_presupuestarias_aprobadas.php";
+$arbol["id"][18]="018";
+$arbol["padre"][18]="014";
+$arbol["numero_hijos"][18]=0;
+
+$arbol["sistema"][19]="SPG";
+$arbol["nivel"][19]=2;
+$arbol["nombre_logico"][19]="Modificaciones Presupuestarias No Aprobadas";
+$arbol["nombre_fisico"][19]="tepuy_spg_r_modificaciones_presupuestarias_no_aprobadas.php";
+$arbol["id"][19]="019";
+$arbol["padre"][19]="014";
+$arbol["numero_hijos"][19]=0;
+
+$arbol["sistema"][20]="SPG";
+$arbol["nivel"][20]=2;
+$arbol["nombre_logico"][20]="Comprobantes";
+$arbol["nombre_fisico"][20]="";
+$arbol["id"][20]="020";
+$arbol["padre"][16]="014";
+$arbol["numero_hijos"][20]=2;
+
+$arbol["sistema"][21]="SPG";
+$arbol["nivel"][21]=3;
+$arbol["nombre_logico"][21]="Comprobante Formato 1";
+$arbol["nombre_fisico"][21]="tepuy_spg_r_comprobante_formato1.php";
+$arbol["id"][21]="021";
+$arbol["padre"][21]="020";
+$arbol["numero_hijos"][21]=0;
+
+$arbol["sistema"][22]="SPG";
+$arbol["nivel"][22]=3;
+$arbol["nombre_logico"][22]="Comprobante Formato 2";
+$arbol["nombre_fisico"][22]="tepuy_spg_r_comprobante_formato2.php";
+$arbol["id"][22]="022";
+$arbol["padre"][22]="020";
+$arbol["numero_hijos"][22]=0;
+
+$arbol["sistema"][23]="SPG";
+$arbol["nivel"][23]=2;
+$arbol["nombre_logico"][23]="Disponibilidad presupuestaria";
+$arbol["nombre_fisico"][23]="";
+$arbol["id"][23]="023";
+$arbol["padre"][23]="014";
+$arbol["numero_hijos"][23]=2;
+
+$arbol["sistema"][24]="SPG";
+$arbol["nivel"][24]=3;
+$arbol["nombre_logico"][24]="Disponibilidad Presupuestaria";
+$arbol["nombre_fisico"][24]="tepuy_spg_r_disponibilidad.php";
+$arbol["id"][24]="024";
+$arbol["padre"][24]="023";
+$arbol["numero_hijos"][24]=0;
+
+$arbol["sistema"][25]="SPG";
+$arbol["nivel"][25]=3;
+$arbol["nombre_logico"][25]="Disponibilidad Presupuestaria";
+$arbol["nombre_fisico"][25]="tepuy_spg_r_disponibilidad_formato2.php";
+$arbol["id"][25]="025";
+$arbol["padre"][22]="023";
+$arbol["numero_hijos"][25]=0;
+
+$arbol["sistema"][26]="SPG";
+$arbol["nivel"][26]=2;
+$arbol["nombre_logico"][26]="Listado de Cuentas Presupuestarias";
+$arbol["nombre_fisico"][26]="tepuy_spg_r_cuentas.php";
+$arbol["id"][26]="026";
+$arbol["padre"][26]="014";
+$arbol["numero_hijos"][26]=0;
+
+$arbol["sistema"][27]="SPG";
+$arbol["nivel"][27]=2;
+$arbol["nombre_logico"][27]="Ejecución Física y Financiera";
+$arbol["nombre_fisico"][27]="tepuy_spg_r_comparados_ejecucion_financiera_formato4.php";
+$arbol["id"][27]="027";
+$arbol["padre"][27]="014";
+$arbol["numero_hijos"][27]=0;
+
+$arbol["sistema"][28]="SPG";
+$arbol["nivel"][28]=1;
+$arbol["nombre_logico"][28]="Otros Reportes";
+$arbol["nombre_fisico"][28]="";
+$arbol["id"][28]="028";
+$arbol["padre"][28]="013";
+$arbol["numero_hijos"][28]=9;
+
+$arbol["sistema"][29]="SPG";
+$arbol["nivel"][29]=2;
+$arbol["nombre_logico"][29]="Distribucion Mensual del Presupuesto";
+$arbol["nombre_fisico"][29]="tepuy_spg_r_distribucion_mensual_presupuesto.php";
+$arbol["id"][29]="029";
+$arbol["padre"][29]="028";
+$arbol["numero_hijos"][29]=0;
+
+$arbol["sistema"][30]="SPG";
+$arbol["nivel"][30]=2;
+$arbol["nombre_logico"][30]="Unidades Ejecutoras";
+$arbol["nombre_fisico"][30]="tepuy_spg_r_unidades_ejecutoras.php";
+$arbol["id"][30]="030";
+$arbol["padre"][30]="028";
+$arbol["numero_hijos"][30]=0;
+
+$arbol["sistema"][31]="SPG";
+$arbol["nivel"][31]=2;
+$arbol["nombre_logico"][31]="Ejecucion de Compromisos";
+$arbol["nombre_fisico"][31]="tepuy_spg_r_ejecucion_compromisos.php";
+$arbol["id"][31]="031";
+$arbol["padre"][31]="028";
+$arbol["numero_hijos"][31]=0;
+
+$arbol["sistema"][32]="SPG";
+$arbol["nivel"][32]=2;
+$arbol["nombre_logico"][32]="Compromisos no Causados";
+$arbol["nombre_fisico"][32]="tepuy_spg_r_compromisos_no_causados.php";
+$arbol["id"][32]="032";
+$arbol["padre"][32]="028";
+$arbol["numero_hijos"][32]=0;
+
+$arbol["sistema"][33]="SPG";
+$arbol["nivel"][33]=2;
+$arbol["nombre_logico"][33]="Compromisos Causados no Pagados";
+$arbol["nombre_fisico"][33]="tepuy_spg_r_compromisos_causados_no_pagados.php";
+$arbol["id"][33]="033";
+$arbol["padre"][33]="028";
+$arbol["numero_hijos"][33]=0;
+
+$arbol["sistema"][34]="SPG";
+$arbol["nivel"][34]=2;
+$arbol["nombre_logico"][34]="Operaciones por Especifica";
+$arbol["nombre_fisico"][34]="tepuy_spg_r_operacion_por_especifica.php";
+$arbol["id"][34]="034";
+$arbol["padre"][34]="028";
+$arbol["numero_hijos"][34]=0;
+
+$arbol["sistema"][35]="SPG";
+$arbol["nivel"][35]=2;
+$arbol["nombre_logico"][35]="Ejecutado por Partida";
+$arbol["nombre_fisico"][35]="tepuy_spg_r_ejecutado_por_partida.php";
+$arbol["id"][35]="035";
+$arbol["padre"][35]="028";
+$arbol["numero_hijos"][35]=0;
+
+$arbol["sistema"][36]="SPG";
+$arbol["nivel"][36]=2;
+$arbol["nombre_logico"][36]="Resumen Proveedor/Beneficiario";
+$arbol["nombre_fisico"][36]="tepuy_spg_r_resumen_prov_bene.php";
+$arbol["id"][36]="036";
+$arbol["padre"][36]="028";
+$arbol["numero_hijos"][36]=0;
+
+$arbol["sistema"][37]="SPG";
+$arbol["nivel"][37]=2;
+$arbol["nombre_logico"][37]="Operación por Banco";
+$arbol["nombre_fisico"][37]="tepuy_spg_r_operacion_por_banco.php";
+$arbol["id"][37]="037";
+$arbol["padre"][37]="028";
+$arbol["numero_hijos"][37]=0;
+
+$arbol["sistema"][38]="SPG";
+$arbol["nivel"][38]=1;
+$arbol["nombre_logico"][38]="Instructivos";
+$arbol["nombre_fisico"][38]="";
+$arbol["id"][38]="038";
+$arbol["padre"][38]="013";
+$arbol["numero_hijos"][38]=14;
+
+$arbol["sistema"][39]="SPG";
+$arbol["nivel"][39]=2;
+$arbol["nombre_logico"][39]="Ejecucion Financiera del Presupuesto (Sector y Programas)";
+$arbol["nombre_fisico"][39]="tepuy_spg_r_instructivo_06_ejec_fin_pry_acc.php";
+$arbol["id"][39]="039";
+$arbol["padre"][39]="038";
+$arbol["numero_hijos"][39]=0;
+
+$arbol["sistema"][40]="SPG";
+$arbol["nivel"][40]=2;
+$arbol["nombre_logico"][40]="Ejecucion Financiera del Presupuesto a Nivel de Actividades";
+$arbol["nombre_fisico"][40]="tepuy_spg_r_instructivo_06_ejec_fin_acc_esp.php";
+$arbol["id"][40]="040";
+$arbol["padre"][40]="038";
+$arbol["numero_hijos"][40]=0;
+
+$arbol["sistema"][41]="SPG";
+$arbol["nivel"][41]=2;
+$arbol["nombre_logico"][41]="Informacion Mensual de la Ejecucion Financiera";
+$arbol["nombre_fisico"][41]="tepuy_spg_r_instructivo_06_inf_men_eje_fin.php";
+$arbol["id"][41]="041";
+$arbol["padre"][41]="038";
+$arbol["numero_hijos"][41]=0;
+
+$arbol["sistema"][42]="SPG";
+$arbol["nivel"][42]=2;
+$arbol["nombre_logico"][42]="Ejecucion Trimestral de Gastos y Aplicaciones Financieras";
+$arbol["nombre_fisico"][42]="tepuy_spg_r_ejecucion_trimestral.php";
+$arbol["id"][42]="042";
+$arbol["padre"][42]="038";
+$arbol["numero_hijos"][42]=0;
+
+$arbol["sistema"][43]="SPG";
+$arbol["nivel"][43]=2;
+$arbol["nombre_logico"][43]="Consolidado de Ejecucion Trimestral de Gastos";
+$arbol["nombre_fisico"][43]="tepuy_spg_r_instructivo_consolidado_ejecucion_trimestral.php";
+$arbol["id"][43]="043";
+$arbol["padre"][43]="038";
+$arbol["numero_hijos"][43]=0;
+
+$arbol["sistema"][44]="SPG";
+$arbol["nivel"][44]=2;
+$arbol["nombre_logico"][44]="Estado de Resultado";
+$arbol["nombre_fisico"][44]="tepuy_spg_r_instructivo_estado_resultado.php";
+$arbol["id"][44]="044";
+$arbol["padre"][44]="038";
+$arbol["numero_hijos"][44]=0;
+
+$arbol["sistema"][45]="SPG";
+$arbol["nivel"][45]=2;
+$arbol["nombre_logico"][45]="Resumen del Presupuesto de Gasto Por Partida(0704)";
+$arbol["nombre_fisico"][45]="tepuy_spg_r_comparados_forma0704.php";
+$arbol["id"][45]="045";
+$arbol["padre"][45]="038";
+$arbol["numero_hijos"][45]=0;
+
+$arbol["sistema"][46]="SPG";
+$arbol["nivel"][46]=2;
+$arbol["nombre_logico"][46]="Resumen del Presupuesto (0705)";
+$arbol["nombre_fisico"][46]="tepuy_spg_r_comparados_forma0705.php";
+$arbol["id"][46]="046";
+$arbol["padre"][46]="038";
+$arbol["numero_hijos"][46]=0;
+
+$arbol["sistema"][47]="SPG";
+$arbol["nivel"][47]=2;
+$arbol["nombre_logico"][47]="Ejecución Financiera  del Presupuesto de Gastos(0707)";
+$arbol["nombre_fisico"][47]="tepuy_spg_r_comparados_ejecucion_financiera_formato3.php";
+$arbol["id"][47]="047";
+$arbol["padre"][47]="038";
+$arbol["numero_hijos"][47]=0;
+
+$arbol["sistema"][48]="SPG";
+$arbol["nivel"][48]=2;
+$arbol["nombre_logico"][48]="Ejecución Financiera Mensual del Presupuesto de Gastos(0402)";
+$arbol["nombre_fisico"][48]="tepuy_spg_r_comparados_forma0402.php";
+$arbol["id"][48]="048";
+$arbol["padre"][48]="038";
+$arbol["numero_hijos"][48]=0;
+
+$arbol["sistema"][49]="SPG";
+$arbol["nivel"][49]=2;
+$arbol["nombre_logico"][49]="Ejecución Financiera de los Proyectos del Ente(0413)";
+$arbol["nombre_fisico"][49]="tepuy_spg_r_comparados_forma0413.php";
+$arbol["id"][49]="049";
+$arbol["padre"][49]="038";
+$arbol["numero_hijos"][49]=0;
+
+$arbol["sistema"][50]="SPG";
+$arbol["nivel"][50]=2;
+$arbol["nombre_logico"][50]="Ejecución Financiera por programas (0414)";
+$arbol["nombre_fisico"][50]="tepuy_spg_r_comparados_forma0414.php";
+$arbol["id"][50]="050";
+$arbol["padre"][50]="038";
+$arbol["numero_hijos"][50]=0;
+
+$arbol["sistema"][51]="SPG";
+$arbol["nivel"][51]=2;
+$arbol["nombre_logico"][51]="Ejecución Financiera a Nivel de Actividades (0415)";
+$arbol["nombre_fisico"][51]="tepuy_spg_r_comparados_forma0415.php";
+$arbol["id"][51]="051";
+$arbol["padre"][51]="038";
+$arbol["numero_hijos"][51]=0;
+
+$arbol["sistema"][52]="SPG";
+$arbol["nivel"][52]=2;
+$arbol["nombre_logico"][52]="Ejecucion Trimestral de Gastos y Aplicaciones Financieras Por Programatica";
+$arbol["nombre_fisico"][52]="tepuy_spg_r_instructivo_ejecucion_trimestral_x_programatica.php";
+$arbol["id"][52]="052";
+$arbol["padre"][52]="038";
+$arbol["numero_hijos"][52]=0;
+
+$arbol["sistema"][53]="SPG";
+$arbol["nivel"][53]=1;
+$arbol["nombre_logico"][53]="Ordenanza y Distribución del Presupuesto";
+$arbol["nombre_fisico"][53]="";
+$arbol["id"][53]="053";
+$arbol["padre"][53]="013";
+$arbol["numero_hijos"][53]=10;
+
+$arbol["sistema"][54]="SPG";
+$arbol["nivel"][54]=2;
+$arbol["nombre_logico"][54]="Identificación de la Institución";
+$arbol["nombre_fisico"][54]="tepuy_spg_r_distribucion_institucion.php";
+$arbol["id"][54]="054";
+$arbol["padre"][54]="053";
+$arbol["numero_hijos"][54]=0;
+
+$arbol["sistema"][55]="SPG";
+$arbol["nivel"][55]=2;
+$arbol["nombre_logico"][55]="Índice de Cátegorias Programáticas";
+$arbol["nombre_fisico"][55]="tepuy_spg_r_distribucion_categorias.php";
+$arbol["id"][55]="055";
+$arbol["padre"][55]="053";
+$arbol["numero_hijos"][55]=0;
+
+$arbol["sistema"][56]="SPG";
+$arbol["nivel"][56]=2;
+$arbol["nombre_logico"][56]="Presupuesto de Ingresos";
+$arbol["nombre_fisico"][56]="tepuy_spg_r_distribucion_ingresos.php";
+$arbol["id"][56]="056";
+$arbol["padre"][56]="053";
+$arbol["numero_hijos"][56]=0;
+
+$arbol["sistema"][57]="SPG";
+$arbol["nivel"][57]=2;
+$arbol["nombre_logico"][57]="Presupuesto a Nivel de Sectores, Programas y Actividades";
+$arbol["nombre_fisico"][57]="tepuy_spg_r_distribucion_asignacion.php";
+$arbol["id"][57]="057";
+$arbol["padre"][57]="053";
+$arbol["numero_hijos"][57]=0;
+
+$arbol["sistema"][58]="SPG";
+$arbol["nivel"][58]=2;
+$arbol["nombre_logico"][58]="Resumen de Créditos Presupuestarios a Nivel de Sectores";
+$arbol["nombre_fisico"][58]="tepuy_spg_r_distribucion_sector.php";
+$arbol["id"][58]="058";
+$arbol["padre"][58]="053";
+$arbol["numero_hijos"][58]=0;
+
+$arbol["sistema"][59]="SPG";
+$arbol["nivel"][59]=2;
+$arbol["nombre_logico"][59]="Resumen de Créditos Presupuestarios a Nivel de Partidas";
+$arbol["nombre_fisico"][59]="tepuy_spg_r_distribucion_partida.php";
+$arbol["id"][59]="059";
+$arbol["padre"][59]="053";
+$arbol["numero_hijos"][59]=0;
+
+$arbol["sistema"][60]="SPG";
+$arbol["nivel"][60]=2;
+$arbol["nombre_logico"][60]="Resumen de Créditos Presupuestarios a Nivel de Sectores, Programas y Partidas";
+$arbol["nombre_fisico"][60]="tepuy_spg_rpp_distribucion_sector_programa_partida.php";
+$arbol["id"][60]="060";
+$arbol["padre"][60]="053";
+$arbol["numero_hijos"][60]=0;
+
+$arbol["sistema"][61]="SPG";
+$arbol["nivel"][61]=2;
+$arbol["nombre_logico"][61]="Resumen de Créditos Presupuestarios a Nivel de Sectores y Partidas";
+$arbol["nombre_fisico"][61]="tepuy_spg_r_distribucion_sector_partida.php";
+$arbol["id"][61]="061";
+$arbol["padre"][61]="053";
+$arbol["numero_hijos"][61]=0;
+
+$arbol["sistema"][62]="SPG";
+$arbol["nivel"][62]=2;
+$arbol["nombre_logico"][62]="Resumen Gastos de Inversión";
+$arbol["nombre_fisico"][62]="tepuy_spg_r_distribucion_inversion.php";
+$arbol["id"][62]="062";
+$arbol["padre"][62]="053";
+$arbol["numero_hijos"][62]=0;
+
+$arbol["sistema"][63]="SPG";
+$arbol["nivel"][63]=2;
+$arbol["nombre_logico"][63]="Relación Global de Proyectos";
+$arbol["nombre_fisico"][63]="tepuy_spg_r_distribucion_proyectos.php";
+$arbol["id"][63]="063";
+$arbol["padre"][63]="053";
+$arbol["numero_hijos"][63]=0;
+
+$arbol["sistema"][64]="SPG";
+$arbol["nivel"][64]=2;
+$arbol["nombre_logico"][64]="Relación de Transferencias";
+$arbol["nombre_fisico"][64]="tepuy_spg_r_distribucion_transferencia.php";
+$arbol["id"][64]="064";
+$arbol["padre"][64]="053";
+$arbol["numero_hijos"][64]=0;
+
+$arbol["sistema"][65]="SPG";
+$arbol["nivel"][65]=0;
+$arbol["nombre_logico"][65]="Configuración";
+$arbol["nombre_fisico"][65]="";
+$arbol["id"][65]="065";
+$arbol["padre"][65]="000";
+$arbol["numero_hijos"][65]=6;
+
+$arbol["sistema"][63]="SPG";
+$arbol["nivel"][63]=1;
+$arbol["nombre_logico"][63]="Plan Único de Recursos y Egresos";
+$arbol["nombre_fisico"][63]="tepuy_scg_plan_unicore.php";
+$arbol["id"][63]="066";
+$arbol["padre"][63]="065";
+$arbol["numero_hijos"][63]=0;
+
+$arbol["sistema"][67]="SPG";
+$arbol["nivel"][67]=1;
+$arbol["nombre_logico"][67]="Estructura Presupuestaria 1";
+$arbol["nombre_fisico"][67]="tepuy_spg_d_estprog1.php";
+$arbol["id"][67]="067";
+$arbol["padre"][67]="065";
+$arbol["numero_hijos"][67]=0;
+
+$arbol["sistema"][68]="SPG";
+$arbol["nivel"][68]=1;
+$arbol["nombre_logico"][68]="Estructura Presupuestaria 2";
+$arbol["nombre_fisico"][68]="tepuy_spg_d_estprog2.php";
+$arbol["id"][68]="068";
+$arbol["padre"][68]="065";
+$arbol["numero_hijos"][68]=0;
+
+$arbol["sistema"][69]="SPG";
+$arbol["nivel"][69]=1;
+$arbol["nombre_logico"][69]="Estructura Presupuestaria 3";
+$arbol["nombre_fisico"][69]="tepuy_spg_d_estprog3.php";
+$arbol["id"][69]="069";
+$arbol["padre"][69]="065";
+$arbol["numero_hijos"][69]=0;
+
+$arbol["sistema"][70]="SPG";
+$arbol["nivel"][70]=1;
+$arbol["nombre_logico"][70]="Fuente de Financiamiento";
+$arbol["nombre_fisico"][70]="tepuy_spg_d_fuentfinan.php";
+$arbol["id"][70]="070";
+$arbol["padre"][70]="065";
+$arbol["numero_hijos"][70]=0;
+
+$arbol["sistema"][71]="SPG";
+$arbol["nivel"][71]=1;
+$arbol["nombre_logico"][71]="Plan de Cuentas";
+$arbol["nombre_fisico"][71]="tepuy_spg_d_planctas.php";
+$arbol["id"][71]="071";
+$arbol["padre"][71]="065";
+$arbol["numero_hijos"][71]=0;
+
+$arbol["sistema"][72]="SPG";
+$arbol["nivel"][72]=1;
+$arbol["nombre_logico"][72]="Unidades Administradoras";
+$arbol["nombre_fisico"][72]="tepuy_spg_d_uniadm.php";
+$arbol["id"][72]="072";
+$arbol["padre"][72]="065";
+$arbol["numero_hijos"][72]=0;
+
+$arbol["sistema"][73]="SPG";
+$arbol["nivel"][73]=1;
+$arbol["nombre_logico"][73]="Unidad Ejecutora";
+$arbol["nombre_fisico"][73]="tepuy_spg_d_unidad.php";
+$arbol["id"][73]="073";
+$arbol["padre"][73]="065";
+$arbol["numero_hijos"][73]=0;
+
+$arbol["sistema"][74]="SPG";
+$arbol["nivel"][74]=1;
+$arbol["nombre_logico"][74]="Firmas";
+$arbol["nombre_fisico"][74]="tepuy_cfg_d_empresa.php";
+$arbol["id"][74]="074";
+$arbol["padre"][74]="065";
+$arbol["numero_hijos"][74]=0;
+
+?>
